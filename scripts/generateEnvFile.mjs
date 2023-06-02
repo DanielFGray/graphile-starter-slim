@@ -56,7 +56,7 @@ async function createConfig(config = {}) {
     DATABASE_VISITOR,
     PORT,
     ROOT_URL,
-    ...PASSWORDS
+    genpwd,
   } = await inquirer.prompt(
     [
       {
@@ -109,33 +109,48 @@ async function createConfig(config = {}) {
         prefix: "",
       },
       {
-        name: "ROOT_DATABASE_PASSWORD",
-        default: () => generatePassword(18),
-        prefix: "",
-      },
-      {
-        name: "DATABASE_OWNER_PASSWORD",
-        default: () => generatePassword(18),
-        prefix: "",
-      },
-      {
-        name: "DATABASE_AUTHENTICATOR_PASSWORD",
-        default: () => generatePassword(18),
-        prefix: "",
-      },
-      {
-        name: "SHADOW_DATABASE_PASSWORD",
-        default: () => generatePassword(18),
-        prefix: "",
-      },
-      {
-        name: "SECRET",
-        default: () => generatePassword(32, "hex"),
+        name: "genpwd",
+        message: "generate passwords?",
+        type: "confirm",
         prefix: "",
       },
     ],
     config,
   );
+
+  const PASSWORDS = genpwd ? {
+      ROOT_DATABASE_PASSWORD: generatePassword(18),
+      DATABASE_OWNER_PASSWORD: generatePassword(18),
+      DATABASE_AUTHENTICATOR_PASSWORD: generatePassword(18),
+      SHADOW_DATABASE_PASSWORD: generatePassword(18),
+      SECRET: generatePassword(32, "hex"),
+  } : await inquirer.prompt([
+    {
+      name: "ROOT_DATABASE_PASSWORD",
+      default: () => generatePassword(18),
+      prefix: "",
+    },
+    {
+      name: "DATABASE_OWNER_PASSWORD",
+      default: () => generatePassword(18),
+      prefix: "",
+    },
+    {
+      name: "DATABASE_AUTHENTICATOR_PASSWORD",
+      default: () => generatePassword(18),
+      prefix: "",
+    },
+    {
+      name: "SHADOW_DATABASE_PASSWORD",
+      default: () => generatePassword(18),
+      prefix: "",
+    },
+    {
+      name: "SECRET",
+      default: () => generatePassword(32, "hex"),
+      prefix: "",
+    },
+  ])
 
   const ROOT_DATABASE_URL = `postgres://${ROOT_DATABASE_USER}:${PASSWORDS.ROOT_DATABASE_PASSWORD}@${DATABASE_HOST}/template1`;
   const DATABASE_URL = `postgres://${DATABASE_OWNER}:${PASSWORDS.DATABASE_OWNER_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}`;
@@ -162,8 +177,6 @@ PORT=${PORT}
 ROOT_URL=${ROOT_URL}
 GITHUB_KEY=${config.GITHUB_KEY || ""}
 GITHUB_SECRET=${config.GITHUB_SECRET || ""}
-TWITTER_KEY=${config.TWITTER_KEY || ""}
-TWITTER_SECRET=${config.TWITTER_SECRET || ""}
 `;
   await fs.writeFile(DOTENV_PATH, envFile, "utf8");
   console.log(".env file updated");
