@@ -4,6 +4,11 @@
     "rootDir": "src",
     "outDir": "dist",
     "allowJs": true,
-    "moduleResolution": "NodeNext"
+    "jsx": "preserve",
+    "moduleResolution": "NodeNext",
+    "lib": ["esnext.asynciterable"],
+    "target": "esnext",
+    "strict": true,
+    "strictNullChecks": true,
   }
 }

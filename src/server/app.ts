@@ -13,6 +13,7 @@ import {
   installLogging,
   installPassport,
   installPostGraphile,
+  installSSR,
   installSameOrigin,
   installSession,
   installSharedStatic,
@@ -151,6 +152,7 @@ export async function makeApp({
     await installCypressServerCommand(app);
   }
   await installPostGraphile(app);
+  await installSSR(app);
 
   /*
    * Error handling middleware

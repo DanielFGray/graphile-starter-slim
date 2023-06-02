@@ -10,4 +10,5 @@ export * from "./installPostGraphile";
 export * from "./installSameOrigin";
 export * from "./installSession";
 export * from "./installSharedStatic";
+export * from "./installSSR";
 export * from "./installWorkerUtils";
