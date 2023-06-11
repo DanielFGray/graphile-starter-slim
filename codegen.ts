@@ -20,7 +20,8 @@ const config: CodegenConfig = {
         "typescript",
         "typescript-operations",
         // "typescript-resolvers",
-        "typed-document-node",
+        'typescript-react-apollo',
+        // "typed-document-node",
       ],
       config: {
         immutableTypes: true,
