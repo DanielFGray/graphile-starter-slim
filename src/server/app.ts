@@ -58,8 +58,7 @@ export async function makeApp({
 } = {}): Promise<Express> {
   sanitizeEnv();
 
-  const isTest = process.env.NODE_ENV === "test";
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = process.env.NODE_ENV !== "production";
 
   const shutdownActions = makeShutdownActions();
 
@@ -150,7 +149,7 @@ export async function makeApp({
   }
   // These are our assets: images/etc; served out of the /@app/server/public folder (if present)
   await installSharedStatic(app);
-  if (isTest || isDev) {
+  if (isDev) {
     await installCypressServerCommand(app);
   }
   await installPostGraphile(app);
