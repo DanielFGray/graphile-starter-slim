@@ -137,7 +137,9 @@ export async function makeApp({
    */
   await installDatabasePools(app);
   await installWorkerUtils(app);
-  await installHelmet(app);
+  if (!isDev) {
+    await installHelmet(app);
+  }
   await installSameOrigin(app);
   await installSession(app);
   await installCSRFProtection(app);
