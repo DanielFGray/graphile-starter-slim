@@ -1,14 +1,20 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist",
     "allowJs": true,
+    "checkJs": true,
     "jsx": "preserve",
     "moduleResolution": "NodeNext",
-    "lib": ["esnext.asynciterable"],
+    "lib": ["dom", "esnext.asynciterable"],
     "target": "esnext",
     "strict": true,
-    "strictNullChecks": true,
-  }
+    "strictNullChecks": true
+  },
+  "include": [
+    "src/**/*",
+    "scripts/**/*",
+    "worker/**/*"
+  ]
 }
