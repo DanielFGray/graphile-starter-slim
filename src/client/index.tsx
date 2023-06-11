@@ -60,7 +60,7 @@ const Init = (
 );
 
 if (import.meta.hot || !container?.innerText) {
-  const root = createRoot(container!);
+  const root = createRoot(container);
   root.render(Init);
 } else {
   hydrateRoot(container, Init);
