@@ -43,7 +43,7 @@ async function readDotenv() {
  * @param {Record<string,string | undefined>} config current environment object
  * @returns {Promise<void>} void
  */
-async function createConfig(config = {}) {
+async function createConfig(config) {
   const packageJson = JSON.parse(await fs.readFile("./package.json", "utf8"));
   const packageName = packageJson.name.replace(/\W/g, "_").replace(/__+/g, "");
 
@@ -56,7 +56,6 @@ async function createConfig(config = {}) {
     DATABASE_VISITOR,
     PORT,
     ROOT_URL,
-    genpwd,
   } = await inquirer.prompt(
     [
       {
@@ -108,50 +107,64 @@ async function createConfig(config = {}) {
         default: prompt => `http://localhost:${prompt.PORT}`,
         prefix: "",
       },
-      {
-        name: "genpwd",
-        message: "generate passwords?",
-        type: "confirm",
-        prefix: "",
-      },
     ],
     config,
   );
 
-  const PASSWORDS = genpwd ? {
-      ROOT_DATABASE_PASSWORD: generatePassword(18),
-      DATABASE_OWNER_PASSWORD: generatePassword(18),
-      DATABASE_AUTHENTICATOR_PASSWORD: generatePassword(18),
-      SHADOW_DATABASE_PASSWORD: generatePassword(18),
-      SECRET: generatePassword(32, "hex"),
-  } : await inquirer.prompt([
-    {
-      name: "ROOT_DATABASE_PASSWORD",
-      default: () => generatePassword(18),
-      prefix: "",
-    },
-    {
-      name: "DATABASE_OWNER_PASSWORD",
-      default: () => generatePassword(18),
-      prefix: "",
-    },
-    {
-      name: "DATABASE_AUTHENTICATOR_PASSWORD",
-      default: () => generatePassword(18),
-      prefix: "",
-    },
-    {
-      name: "SHADOW_DATABASE_PASSWORD",
-      default: () => generatePassword(18),
-      prefix: "",
-    },
-    {
-      name: "SECRET",
-      default: () => generatePassword(32, "hex"),
-      prefix: "",
-    },
-  ])
+  let PASSWORDS = {
+    ROOT_DATABASE_PASSWORD: config?.ROOT_DATABASE_PASSWORD,
+    DATABASE_OWNER_PASSWORD: config?.DATABASE_OWNER_PASSWORD,
+    DATABASE_AUTHENTICATOR_PASSWORD: config?.DATABASE_AUTHENTICATOR_PASSWORD,
+    SHADOW_DATABASE_PASSWORD: config?.SHADOW_DATABASE_PASSWORD,
+    SECRET: config?.SECRET,
+  };
 
+  if (!Object.values(PASSWORDS).every(Boolean)) {
+    const { genpwd } = await inquirer.prompt({
+      name: "genpwd",
+      message: "generate passwords?",
+      type: "confirm",
+      prefix: "",
+    });
+    PASSWORDS = genpwd
+      ? {
+          ROOT_DATABASE_PASSWORD: generatePassword(18),
+          DATABASE_OWNER_PASSWORD: generatePassword(18),
+          DATABASE_AUTHENTICATOR_PASSWORD: generatePassword(18),
+          SHADOW_DATABASE_PASSWORD: generatePassword(18),
+          SECRET: generatePassword(32, "hex"),
+        }
+      : await inquirer.prompt(
+          [
+            {
+              name: "ROOT_DATABASE_PASSWORD",
+              default: () => generatePassword(18),
+              prefix: "",
+            },
+            {
+              name: "DATABASE_OWNER_PASSWORD",
+              default: () => generatePassword(18),
+              prefix: "",
+            },
+            {
+              name: "DATABASE_AUTHENTICATOR_PASSWORD",
+              default: () => generatePassword(18),
+              prefix: "",
+            },
+            {
+              name: "SHADOW_DATABASE_PASSWORD",
+              default: () => generatePassword(18),
+              prefix: "",
+            },
+            {
+              name: "SECRET",
+              default: () => generatePassword(32, "hex"),
+              prefix: "",
+            },
+          ],
+          PASSWORDS,
+        );
+  }
   const ROOT_DATABASE_URL = `postgres://${ROOT_DATABASE_USER}:${PASSWORDS.ROOT_DATABASE_PASSWORD}@${DATABASE_HOST}/template1`;
   const DATABASE_URL = `postgres://${DATABASE_OWNER}:${PASSWORDS.DATABASE_OWNER_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}`;
   const AUTH_DATABASE_URL = `postgres://${DATABASE_AUTHENTICATOR}:${PASSWORDS.DATABASE_AUTHENTICATOR_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}`;
@@ -175,11 +188,11 @@ DATABASE_VISITOR=${DATABASE_VISITOR}
 SECRET=${PASSWORDS.SECRET}
 PORT=${PORT}
 ROOT_URL=${ROOT_URL}
-GITHUB_KEY=${config.GITHUB_KEY || ""}
-GITHUB_SECRET=${config.GITHUB_SECRET || ""}
+GITHUB_KEY=${config?.GITHUB_KEY || ""}
+GITHUB_SECRET=${config?.GITHUB_SECRET || ""}
 `;
   await fs.writeFile(DOTENV_PATH, envFile, "utf8");
-  console.log(".env file updated");
+  console.log(`.env file ${config ? "updated" : "created"}`);
 }
 
 async function main() {
