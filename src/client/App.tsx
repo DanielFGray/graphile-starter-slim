@@ -7,7 +7,9 @@ export function App() {
   return (
     <div>
       <h1>hello {name}</h1>
-      <input type="text" onChange={ev => setName(ev.target.value)} value={name} />
+      <form>
+        <input type="text" onChange={ev => setName(ev.target.value)} value={name} />
+      </form>
       <pre>{JSON.stringify({ data, loading, error }, null, 2)}</pre>
       <button onClick={() => refetch()}>refetch</button>
     </div>
