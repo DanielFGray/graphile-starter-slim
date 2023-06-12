@@ -31,7 +31,7 @@ async function main() {
     );
     console.log("GraphQL schema exported");
   } finally {
-    authPgPool.end();
+    await authPgPool.end();
   }
 }
 
