@@ -13,7 +13,13 @@ if (!container) throw new Error("no root container found!");
 
 let initialState: any = {};
 const initStateEl = document.getElementById("initialState");
-if (initStateEl) initialState = JSON.parse(initStateEl.innerText);
+if (initStateEl) {
+  try {
+    initialState = JSON.parse(initStateEl.innerText);
+  } catch {
+    /* fallthrough */
+  }
+}
 const CSRF_TOKEN = initialState.CSRF_TOKEN;
 
 const apolloClient = new ApolloClient({
