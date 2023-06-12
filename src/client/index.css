@@ -1,4 +1,50 @@
+body,
+html {
+  height: 100%;
+}
 body {
+  margin: 0;
+  padding: 1em;
+  font-family: sans;
   background: #333;
   color: #ddd;
+}
+
+h1 {
+  margin: 0 0 0.5em 0;
+  padding: 0;
+  font-weight: 900;
+}
+
+textarea,
+input[type="text"] {
+  outline: 2px solid #369;
+  border: 1px transparent;
+}
+
+input[type="text"] {
+  background: #292929;
+  border: 0;
+  /*border: 1px inset #666;*/
+  color: #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2), inset -1px -1px 2px rgba(255, 255, 255, 0.2);
+}
+
+button,
+input[type="button"] {
+  background: #494949;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+  border: 0;
+  color: #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+button:active,
+input[type="button"]:active {
+  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.2), inset -1px -1px 2px rgba(255, 255, 255, 0.2);
 }
