@@ -12,9 +12,5 @@
     "strict": true,
     "strictNullChecks": true
   },
-  "include": [
-    "src/**/*",
-    "scripts/**/*",
-    "worker/**/*"
-  ]
+  "include": ["src/**/*", "scripts/**/*", "worker/**/*"]
 }

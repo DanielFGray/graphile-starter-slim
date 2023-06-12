@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import pg from "pg";
 import { makeSchema } from "postgraphile";
-
 import { getPreset } from "../src/graphile.config";
 
 const AUTH_DATABASE_URL = process.env.AUTH_DATABASE_URL;

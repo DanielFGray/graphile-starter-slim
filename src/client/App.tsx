@@ -1,8 +1,8 @@
-import { useState } from "react"
-import { useSharedQuery } from "../generated"
+import { useState } from "react";
+import { useSharedQuery } from "../generated";
 
 export function App() {
-  const [name, setName] = useState('world')
+  const [name, setName] = useState("world");
   const { data, loading, error, refetch } = useSharedQuery();
   return (
     <div>
@@ -13,5 +13,5 @@ export function App() {
       <pre>{JSON.stringify({ data, loading, error }, null, 2)}</pre>
       <button onClick={() => refetch()}>refetch</button>
     </div>
-  )
+  );
 }

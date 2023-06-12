@@ -6,9 +6,8 @@
   "license": "Unlicense",
   "homepage": "https://github.com/DanielFGray/graphile-starter-slim",
   "scripts": {
-    "typesync": "typesync --ignoredeps=dev",
     "prestart": "run-s -s db:start",
-    "watch:tsc": "run-s -s 'type-check --watch'",
+    "watch:tsc": "run-s -s 'typecheck --watch'",
     "watch:gqlgen": "run-s -s 'gqlgen -w'",
     "watch:server": "tsnd -T -r dotenv/config ./src/server/index.ts",
     "watch:db": "run-s -s 'gm watch'",
@@ -37,7 +36,8 @@
     "lint": "run-p -sc lint:*",
     "lint-fix:js": "run-p -s 'lint:js --fix'",
     "lint-fix": "run-p -sc lint-fix:*",
-    "type-check": "tsc --noEmit --pretty --preserveWatchOutput"
+    "typesync": "typesync --ignoredeps=dev",
+    "typecheck": "tsc --noEmit --pretty --preserveWatchOutput"
   },
   "dependencies": {
     "@apollo/client": "^3.7.15",

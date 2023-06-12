@@ -10,7 +10,12 @@ import "../client/index.css";
 import { GraphileApolloLink } from "./GraphileApolloLink";
 import { PostGraphileInstance } from "postgraphile";
 
-export async function render({ url, req, res, pgl }: {
+export async function render({
+  url,
+  req,
+  res,
+  pgl,
+}: {
   url: string;
   req: Request;
   res: Response;

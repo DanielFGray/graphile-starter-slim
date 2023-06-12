@@ -15,7 +15,6 @@ let initialState: any = {};
 const initStateEl = document.getElementById("initialState");
 if (initStateEl) initialState = JSON.parse(initStateEl.innerText);
 const CSRF_TOKEN = initialState.CSRF_TOKEN;
-console.log({ CSRF_TOKEN });
 
 const apolloClient = new ApolloClient({
   link: ApolloLink.from([
@@ -44,7 +43,7 @@ const apolloClient = new ApolloClient({
         queryType: true,
       },
     },
-  }).restore(initialState || {}),
+  }).restore(initialState),
 });
 
 const Init = (
