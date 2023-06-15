@@ -4,3 +4,4 @@ src/generated/
 .env
 .eslintcache
 dist
+.swc

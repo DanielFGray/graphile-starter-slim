@@ -10,12 +10,12 @@ import { Pool } from "pg";
 import postgraphilePresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import OrdersPlugin from "./server/plugins/Orders";
-import PassportLoginPlugin from "./server/plugins/PassportLoginPlugin";
-import PrimaryKeyMutationsOnlyPlugin from "./server/plugins/PrimaryKeyMutationsOnlyPlugin";
-import RemoveQueryQueryPlugin from "./server/plugins/RemoveQueryQueryPlugin";
-import SubscriptionsPlugin from "./server/plugins/SubscriptionsPlugin";
-import handleErrors from "./server/utils/handleErrors";
+import OrdersPlugin from "./plugins/Orders";
+import PassportLoginPlugin from "./plugins/PassportLoginPlugin";
+import PrimaryKeyMutationsOnlyPlugin from "./plugins/PrimaryKeyMutationsOnlyPlugin";
+import RemoveQueryQueryPlugin from "./plugins/RemoveQueryQueryPlugin";
+import SubscriptionsPlugin from "./plugins/SubscriptionsPlugin";
+import handleErrors from "./utils/handleErrors";
 
 declare global {
   namespace Grafast {

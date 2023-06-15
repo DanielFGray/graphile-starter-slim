@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, Express } from "express";
 import fs from "node:fs";
 import { template, TemplateExecutor } from "lodash";
-import { resolve } from "node:path";
+import path from "node:path";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -48,7 +48,8 @@ function parseError(
 let errorPageTemplate: TemplateExecutor;
 function getErrorPage({ message }: ParsedError) {
   if (!errorPageTemplate || isDev) {
-    errorPageTemplate = template(fs.readFileSync(resolve(__dirname, "../../error.html"), "utf8"));
+    const errorPath = path.resolve("src/client/error.html")
+    errorPageTemplate = template(fs.readFileSync(errorPath, "utf8"));
   }
 
   return errorPageTemplate({

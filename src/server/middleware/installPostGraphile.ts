@@ -5,7 +5,7 @@ import { OutgoingHttpHeaders } from "node:http2";
 import { postgraphile } from "postgraphile";
 
 import { getHttpServer, getUpgradeHandlers, getWebsocketMiddlewares } from "../app";
-import { getPreset } from "../../graphile.config";
+import { getPreset } from "../graphile.config";
 import { getAuthPgPool, getRootPgPool } from "./installDatabasePools";
 
 export async function installPostGraphile(app: Express) {

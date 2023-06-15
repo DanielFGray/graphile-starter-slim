@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!--{meta}-->
+    ${meta}
+    <link rel="stylesheet" href="/src/client/index.css" />
   </head>
 
   <body>
-    <div id="root"><!--{ssrOutlet}--></div>
+    <div id="root">${ssrOutlet}</link>
     <script id="initialState" type="application/json">
-      <!--{ssrData}-->
+      ${ssrData}
     </script>
     <script type="module" src="/src/client/index.tsx"></script>
   </body>

@@ -1,0 +1,12 @@
+query LatestPosts {
+  posts(orderBy: CREATED_AT_DESC) {
+    nodes {
+      postId
+      title
+      body
+      score
+      popularity
+      createdAt
+    }
+  }
+}

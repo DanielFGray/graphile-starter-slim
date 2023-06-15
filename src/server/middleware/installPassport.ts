@@ -41,15 +41,17 @@ export async function installPassport(app: Express) {
         clientSecret: process.env.GITHUB_SECRET,
         scope: ["user:email"],
       },
-      authenticateConfig: {},
-      getUserInformation: ({ profile }) => ({
-        id: profile.id,
-        displayName: profile?.displayName ?? profile.username,
-        username: profile.username,
-        avatarUrl: profile?.photos?.[0]?.value,
-        email: profile.email || profile?.emails?.[0]?.value,
-      }),
       tokenNames: ["token", "tokenSecret"],
+      authenticateConfig: {},
+      getUserInformation({ profile }) {
+        return {
+          id: profile.id,
+          displayName: profile?.displayName ?? profile.username,
+          username: profile.username,
+          avatarUrl: profile?.photos?.[0]?.value,
+          email: profile.email || profile?.emails?.[0]?.value,
+        }
+      },
     });
   }
 }

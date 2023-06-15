@@ -1,12 +1,9 @@
 /* eslint-disable no-console */
 import { createServer, IncomingMessage } from "node:http";
 import { Duplex } from "node:stream";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import chalk from "chalk";
-
 import { getShutdownActions, getUpgradeHandlers, makeApp } from "./app";
-
-const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -48,8 +45,10 @@ async function main() {
     httpServer.addListener("upgrade", handleUpgrade);
   }
 
+  const packageJson = JSON.parse(await fs.readFile("./package.json", "utf8"));
+
   // And finally, we open the listen port
-  const PORT = parseInt(process.env.PORT || "", 10) || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
   httpServer.listen(PORT, () => {
     const address = httpServer.address();
     const actualPort: string =

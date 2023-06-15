@@ -20,14 +20,6 @@ export interface UserSpec {
   auth?: any;
 }
 
-export type GetUserInformationFunction = (
-  profile: any,
-  accessToken: string,
-  refreshToken: string,
-  extra: any,
-  req: Request,
-) => UserSpec | Promise<UserSpec>;
-
 /*
  * Add returnTo property using [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
  */
@@ -81,7 +73,13 @@ export async function installPassportStrategy(
     strategy: new (...args: any) => passport.Strategy;
     strategyConfig: any;
     authenticateConfig?: any;
-    getUserInformation: GetUserInformationFunction;
+    getUserInformation: (
+      profile: any,
+      accessToken: string,
+      refreshToken: string,
+      extra: any,
+      req: Request,
+    ) => UserSpec | Promise<UserSpec>;
     tokenNames: string[];
     hooks?: {
       preRequest?: undefined | ((req: Express.Request) => void);
@@ -107,13 +105,13 @@ export async function installPassportStrategy(
         done: (error: any, user?: any) => void,
       ) => {
         try {
-          const userInformation = await getUserInformation(
+          const userInformation = await getUserInformation({
             profile,
             accessToken,
             refreshToken,
             extra,
             req,
-          );
+          });
           if (!userInformation.id) {
             throw new Error(`getUserInformation must return a unique id for each user`);
           }
