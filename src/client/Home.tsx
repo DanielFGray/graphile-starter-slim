@@ -1,5 +1,4 @@
-import { Button, Container, Fieldset, Form, Input, RenderErrors } from "../components";
-import { Layout } from "../components/Layout";
+import { Layout, Button, Container, Fieldset, Form, Input, RenderErrors } from "../components";
 import { useCreatePostMutation, useLatestPostsQuery } from "../generated";
 
 export default function Home() {
