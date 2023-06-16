@@ -73,13 +73,13 @@ export async function installPassportStrategy(
     strategy: new (...args: any) => passport.Strategy;
     strategyConfig: any;
     authenticateConfig?: any;
-    getUserInformation: (
+    getUserInformation: (info: {
       profile: any,
       accessToken: string,
       refreshToken: string,
       extra: any,
       req: Request,
-    ) => UserSpec | Promise<UserSpec>;
+    }) => UserSpec | Promise<UserSpec>;
     tokenNames: string[];
     hooks?: {
       preRequest?: undefined | ((req: Express.Request) => void);
