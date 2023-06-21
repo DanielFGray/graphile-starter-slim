@@ -1,51 +1,82 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Routes, Route, NavLink } from "react-router-dom";
 import {
-  EmailsForm_UserEmailFragment,
-  SettingsEmailsQuery,
+  SettingsQuery,
   useChangePasswordMutation,
   useConfirmAccountDeletionMutation,
   useDeleteEmailMutation,
   useMakeEmailPrimaryMutation,
   useRequestAccountDeletionMutation,
   useResendEmailVerificationMutation,
-  useSettingsEmailsQuery,
+  useSettingsQuery,
   useUpdateUserMutation,
   useAddEmailMutation,
+  useUnlinkUserAuthenticationMutation,
 } from "../generated";
-import { extractError } from "../lib";
 import {
   Layout,
   Fieldset,
   Input,
   Form,
+  FormRow,
   Button,
-  RenderErrors,
+  FormErrors,
   Danger,
   Container,
+  Legend,
+  SocialLogin,
 } from "../components";
+import { useLogout } from "../lib";
 
-export default function SingleSettingsPage() {
-  const query = useSettingsEmailsQuery();
+export default function SettingsPage() {
+  const query = useSettingsQuery();
   return (
-    <Layout title="Settings" forbidWhen={auth => auth.LOGGED_OUT}>
-      {({ logout }) => (
-        <div className="flex flex-col gap-4 px-4">
-          <UserProfile data={query.data} />
-          <PasswordSettings data={query.data} />
-          <EmailSettings data={query.data} />
-          <DeleteAccount logout={logout} />
+    <Layout query={query} title="Settings" forbidWhen={auth => auth.LOGGED_OUT}>
+      <Container className="max-w-4xl mx-auto mb-4">
+        {/*<ul className="flex xl:flex-col p-4 justify-around xl:justify-start flex-row gap-1 xl:gap-4 items-middle xl:w-1/4 xl:p-8">
+          <li>
+            <NavLink to="profile">profile</NavLink>
+          </li>
+          <li>
+            <NavLink to="accounts">accounts</NavLink>
+          </li>
+          <li>
+            <NavLink to="email">email</NavLink>
+          </li>
+          <li>
+            <NavLink to="delete">delete</NavLink>
+          </li>
+        </ul>*/}
+        <div className="flex-grow">
+          <Routes>
+            <Route path="profile" element={<UserProfile data={query.data} />} />
+            <Route path="email" element={<EmailSettings data={query.data} />} />
+            <Route path="accounts" element={<LinkedAccounts data={query.data} />} />
+            <Route path="delete" element={<DeleteAccount />} />
+            <Route
+              index
+              element={
+                <>
+                  <UserProfile data={query.data} />
+                  <PasswordSettings data={query.data} />
+                  <EmailSettings data={query.data} />
+                  <LinkedAccounts data={query.data} />
+                  <DeleteAccount />
+                </>
+              }
+            />
+          </Routes>
         </div>
-      )}
+      </Container>
     </Layout>
   );
 }
 
-function UserProfile({ data }: { data: SettingsEmailsQuery }) {
+function UserProfile({ data }: { data: SettingsQuery }) {
   const [updateUser, updateMutation] = useUpdateUserMutation();
   return (
     <Form
-      onSubmit={async (ev, { values }) => {
+      onSubmit={async ({ values }) => {
         await updateUser({
           variables: {
             id: data.currentUser?.id,
@@ -57,33 +88,33 @@ function UserProfile({ data }: { data: SettingsEmailsQuery }) {
         });
       }}
     >
-      {({ error }) => (
-        <Fieldset>
-          <legend>profile settings</legend>
-          <Container>
+      <Fieldset>
+        <Legend>profile settings</Legend>
+        <Container>
+          <FormRow label="username:">
             <Input
               type="text"
               name="username"
-              defaultValue={data?.currentUser.username}
+              defaultValue={data?.currentUser!.username}
               placeholder="username [required]"
               required
-              label={<span>username:</span>}
             />
+          </FormRow>
+          <FormRow label="name:">
             <Input
               type="text"
               name="name"
-              defaultValue={data?.currentUser.name}
+              defaultValue={data?.currentUser!.name ?? undefined}
               placeholder="name"
-              label={<span>name:</span>}
             />
-            <div>
-              <Button type="submit">update</Button>
-              {updateMutation.data && "Success"}
-            </div>
-          </Container>
-          <RenderErrors errors={error} />
-        </Fieldset>
-      )}
+          </FormRow>
+          <div>
+            <Button type="submit">update</Button>
+            {updateMutation.data && "Success"}
+          </div>
+        </Container>
+        <FormErrors />
+      </Fieldset>
     </Form>
   );
 }
@@ -92,9 +123,9 @@ function PasswordSettings({ data }: { data: SettingsEmailsQuery }) {
   const [changePassword, changePasswordMutation] = useChangePasswordMutation();
   return (
     <Form
-      onSubmit={async (ev, { values, setError }) => {
+      onSubmit={async ({ values, setErrors }) => {
         if (values["newPassword"] !== values["confirmPassword"]) {
-          setError("passwords do not match");
+          setErrors("passwords do not match");
           return;
         }
         await changePassword({
@@ -105,42 +136,28 @@ function PasswordSettings({ data }: { data: SettingsEmailsQuery }) {
         });
       }}
     >
-      {({ error }) => (
-        <Fieldset>
-          <legend>password settings</legend>
-          <Container>
-            {data?.currentUser?.hasPassword ? (
-              <Input
-                type="password"
-                name="oldPassword"
-                required
-                minLength={6}
-                label={<span>old password:</span>}
-              />
-            ) : null}
-            <Input
-              type="password"
-              name="newPassword"
-              required
-              minLength={6}
-              label={<span>new password:</span>}
-            />
-            <Input
-              type="password"
-              name="confirmPassword"
-              required
-              minLength={6}
-              label={<span>confirm password:</span>}
-            />
-            <div>
-              <Button type="submit">change password</Button>
-              {changePasswordMutation.loading && "Loading"}
-              {changePasswordMutation.data && "Success"}
-            </div>
-          </Container>
-          <RenderErrors errors={error} />
-        </Fieldset>
-      )}
+      <Fieldset>
+        <Legend>password settings</Legend>
+        <Container>
+          {data?.currentUser?.hasPassword ? (
+            <FormRow label="old password:">
+              <Input type="password" name="oldPassword" required minLength={6} />
+            </FormRow>
+          ) : null}
+          <FormRow label={<span>new password:</span>}>
+            <Input type="password" name="newPassword" required minLength={6} />
+          </FormRow>
+          <FormRow label={<span>confirm password:</span>}>
+            <Input type="password" name="confirmPassword" required minLength={6} />
+          </FormRow>
+          <div>
+            <Button type="submit">change password</Button>
+            {changePasswordMutation.loading && "Loading"}
+            {changePasswordMutation.data && "Success"}
+          </div>
+        </Container>
+        <FormErrors />
+      </Fieldset>
     </Form>
   );
 }
@@ -148,20 +165,27 @@ function PasswordSettings({ data }: { data: SettingsEmailsQuery }) {
 function EmailSettings({ data }: { data: SettingsEmailsQuery }) {
   return (
     <Fieldset>
-      <legend>email settings</legend>
+      <Legend>email settings</Legend>
       <Container>
-        {data?.currentUser.userEmails.nodes.map(email => (
-          <Email
-            key={email.id}
-            email={email}
-            hasOtherEmails={data.currentUser.userEmails.nodes.length > 1}
-          />
-        ))}
         <div>
-          <Button type="submit">update emails</Button>
+          <Container>
+            {data?.currentUser?.userEmails.nodes.map(email => (
+              <Email
+                key={email.id}
+                email={email}
+                hasOtherEmails={data?.currentUser?.userEmails.nodes.length > 1}
+              />
+            ))}
+          </Container>
+          <FormErrors
+            errors={
+              data?.currentUser && data?.currentUser.isVerified
+                ? null
+                : `You do not have any verified email addresses, this will make account recovery impossible and may limit your available functionality within this application. Please complete email verification.`
+            }
+          />
         </div>
         <AddEmailForm />
-        <RenderErrors errors={data?.currentUser && data?.currentUser.isVerified ? null : `You do not have any verified email addresses, this will make account recovery impossible and may limit your available functionality within this application. Please complete email verification.`} />
       </Container>
     </Fieldset>
   );
@@ -201,7 +225,10 @@ function Email({
           <Button onClick={() => deleteEmail({ variables: { emailId: email.id } })}>Delete</Button>
         )}
         {!email.isVerified && (
-          <Button onClick={() => resendEmailVerification({ variables: { emailId: email.id } })}>
+          <Button
+            variant="primary"
+            onClick={() => resendEmailVerification({ variables: { emailId: email.id } })}
+          >
             Resend verification
           </Button>
         )}
@@ -217,25 +244,89 @@ function Email({
 
 function AddEmailForm() {
   const [addEmail] = useAddEmailMutation();
+  const [showForm, setShowForm] = useState<boolean>(false);
+  if (!showForm) {
+    return (
+      <div>
+        <Button type="submit" value="Add email" onClick={() => setShowForm(true)} />
+      </div>
+    );
+  }
   return (
     <Form
-      className="flex flex-row gap-2"
-      onSubmit={async (ev, { values }) => {
+      onSubmit={async ({ values }) => {
         await addEmail({ variables: values });
       }}
     >
-      {({ error }) => (
-        <>
-          <Input type="email" name="newEmail" required label={<span>new email:</span>} />
-          <Button type="submit" value="Add email" />
-          <RenderErrors errors={error} />
-        </>
-      )}
+      <FormRow label="new email:">
+        <Input type="email" name="email" required />
+      </FormRow>
+      <div>
+        <Button variant="primary" type="submit" value="Add email" />
+      </div>
+      <FormErrors />
     </Form>
   );
 }
 
-function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
+function UnlinkAccountButton({ id }: { id: string }) {
+  const [doUnlink, { loading: deleting }] = useUnlinkUserAuthenticationMutation();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [errors, setErrors] = useState();
+
+  async function handleUnlink() {
+    setModalOpen(false);
+    try {
+      await doUnlink({ variables: { id } });
+    } catch (e) {
+      setErrors(e);
+    }
+  }
+
+  return (
+    <div>
+      {modalOpen ? (
+        <div>
+          <b>Are you sure?</b>
+          <p>
+            If you unlink this account you won&apos;t be able to log in with it any more; please
+            make sure your email is valid.
+          </p>
+          <div>
+            <Button variant="primary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleUnlink}>
+              Unlink
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      <button disabled={deleting} onClick={() => setModalOpen(true)}>
+        Unlink
+      </button>
+      <FormErrors errors={errors} />
+    </div>
+  );
+}
+
+function LinkedAccounts({ data }: { data: SettingsQuery }) {
+  return (
+    <Fieldset>
+      <Legend>manage linked accounts</Legend>
+      {data?.currentUser?.authentications.map(auth => (
+        <div>
+          <strong>{auth.service}</strong>
+          <div>Added ${new Date(Date.parse(auth.createdAt)).toLocaleString()}</div>
+          <UnlinkAccountButton key="unlink" id={auth.id} />
+        </div>
+      ))}
+      <SocialLogin next="/settings/accounts" label={service => `Link ${service} account`} />
+    </Fieldset>
+  );
+}
+
+function DeleteAccount() {
   const [requestAccountDeletion] = useRequestAccountDeletionMutation();
   const [confirmAccountDeletion] = useConfirmAccountDeletionMutation();
   const [errors, setErrors] = useState<string | null>(null);
@@ -244,7 +335,8 @@ function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
   const [itIsDone, setItIsDone] = useState(false);
   const [doingIt, setDoingIt] = useState(false);
   const [params] = useSearchParams();
-  const token = params.get("token");
+  const logout = useLogout();
+  const token = params.get("delete_token");
   function doIt() {
     setErrors(null);
     setDoingIt(true);
@@ -277,7 +369,7 @@ function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
         await confirmAccountDeletion({ variables: { token } });
         // Display confirmation
         setDeleted(true);
-        await logout();
+        logout();
       } catch (e) {
         setErrors(e);
       }
@@ -291,7 +383,7 @@ function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
   return (
     <form onSubmit={ev => ev.preventDefault()}>
       <Fieldset>
-        <Danger as="legend">danger zone</Danger>
+        <legend className="p-2 -rotate-3 bg-red-700 text-red-100">danger zone</legend>
         {token ? (
           <div>
             <p>
@@ -301,7 +393,8 @@ function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
             </p>
             <p className="text-right">
               <Button
-                className="bg-red-200 border-red-300 text-red-800"
+                variant="danger"
+                className="font-bold"
                 onClick={confirmDeletion}
                 disabled={deleting}
               >
@@ -316,16 +409,12 @@ function DeleteAccount({ logout }: { logout: () => Promise<void> }) {
           </div>
         ) : (
           <p className="text-right">
-            <Button
-              className="bg-red-200 border-red-300 text-red-800"
-              onClick={doIt}
-              disabled={doingIt}
-            >
+            <Button variant="danger" onClick={doIt} disabled={doingIt}>
               I want to delete my account
             </Button>
           </p>
         )}
-        <RenderErrors errors={errors} />
+        <FormErrors errors={[errors]} />
       </Fieldset>
     </form>
   );

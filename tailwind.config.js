@@ -1,13 +1,13 @@
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  content: ["./src/components/**/*.tsx", "./src/client/**/*.tsx"],
+  content: ["./src/**/*.tsx", "./src/**/*.html", "./src/**/*.html"],
   darkMode: "class",
   theme: {
     extend: {
       colors: {
-        gray: colors.neutral,
-        primary: colors.emerald,
+        gray: colors.slate,
+        primary: colors.slate,
       },
     },
   },

@@ -1,47 +1,57 @@
 import React from "react";
-import { ErrorBoundary as DefaultErrorBoundary, FallbackProps } from "react-error-boundary";
-import { NavLink, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { ErrorBoundary as DefaultErrorBoundary } from "react-error-boundary";
+import { NavLink, NavLinkProps, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   SharedLayoutQuery,
+  SharedLayout_QueryFragment,
   useCurrentUserUpdatedSubscription,
-  useLogoutMutation,
-  useSharedLayoutQuery,
 } from "../generated";
-import { useApolloClient } from "@apollo/client";
+import { type QueryResult } from "@apollo/client";
 import { Helmet } from "react-helmet-async";
 import { Button, clsx } from ".";
+import { useLogout } from "../lib";
 
-function Nav({
-  loggedIn,
-  logout,
-}: {
-  loggedIn: boolean;
-  logout: (ev: React.MouseEvent) => void;
-}): JSX.Element {
+const appTitle = "pglslim";
+
+const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
+  return clsx(
+    route.isActive ? "font-bold decoration-primary-200" : "decoration-primary-400",
+    "underline hover:decoration-primary-200 decoration-thick decoration-2",
+  );
+};
+
+function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] }) {
+  const logout = useLogout();
   return (
     <header>
-      <nav className="border-b bg-gray-100 border-gray-300 mb-2 tracking-tight">
+      <nav className="border-b text-primary-100 bg-primary-800 border-primary-540 mb-4 tracking-tight">
         <ul className="flex flex-row justify-between gap-4 p-4">
           <div>
             <li>
-              <NavLink to="/" className={({ isActive }) => clsx(isActive && "font-bold")}>
+              <NavLink to="/" className={NavStyles}>
                 home
               </NavLink>
             </li>
           </div>
           <div className="flex flex-row gap-4">
-            {loggedIn ? (
+            {currentUser ? (
               <>
+                <div className="border-r border-primary-400 pr-4">
+                  signed in as <span className="font-bold">{currentUser.username}</span>
+                </div>
                 <li>
-                  <NavLink
-                    to="/settings"
-                    className={({ isActive }) => clsx(isActive && "font-bold")}
-                  >
+                  <NavLink to="/settings" className={NavStyles}>
                     settings
                   </NavLink>
                 </li>
                 <li>
-                  <a href="/logout" onClick={logout}>
+                  <a
+                    href="/logout"
+                    className={NavStyles?.({})}
+                    onClick={() => {
+                      void logout();
+                    }}
+                  >
                     sign out
                   </a>
                 </li>
@@ -49,16 +59,13 @@ function Nav({
             ) : (
               <>
                 <li>
-                  <NavLink
-                    to="/register"
-                    className={({ isActive }) => clsx(isActive && "font-bold")}
-                  >
-                    register
+                  <NavLink to="/signup" className={NavStyles({isActive:true})}>
+                      create an account
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/login" className={({ isActive }) => clsx(isActive && "font-bold")}>
-                    log in
+                  <NavLink to="/signin" className={NavStyles}>
+                    sign in
                   </NavLink>
                 </li>
               </>
@@ -90,24 +97,20 @@ function CurrentUserUpdatedSubscription() {
 }
 
 export function Layout({
-  children,
+  children: children,
   title,
   forbidWhen: when = auth => auth.NEVER,
+  query,
 }: {
-  children:
-    | React.ReactNode
-    | ((p: {
-        currentUser: SharedLayoutQuery["currentUser"];
-        logout: () => Promise<void>;
-      }) => React.ReactNode);
+  query: Pick<
+    QueryResult<SharedLayout_QueryFragment>,
+    "data" | "loading" | "error" | "networkStatus" | "client" | "refetch"
+  >;
+  children: React.ReactNode;
   title?: string;
   forbidWhen?: (auth: typeof AuthRestrict) => AuthRestrict;
 }) {
-  const query = useSharedLayoutQuery();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [handleLogout] = useLogoutMutation();
-  const apolloClient = useApolloClient();
 
   const forbidWhen = when(AuthRestrict);
   const forbidsLoggedOut = forbidWhen & AuthRestrict.LOGGED_OUT;
@@ -124,34 +127,24 @@ export function Layout({
     !query.error &&
     forbidsLoggedOut
   ) {
-    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace={true} />;
-  }
-
-  async function logout() {
-    try {
-      await handleLogout();
-      await apolloClient.resetStore();
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-      // navigate("/logout");
-    }
+    return <Navigate to={`/signup?next=${encodeURIComponent(location.pathname)}`} replace={true} />;
   }
 
   return (
     <>
-      {query.data && query.data.currentUser ? <CurrentUserUpdatedSubscription /> : null}
-      {title && (
-        <Helmet>
-          <title>{title}</title>
-        </Helmet>
-      )}
-      <Nav loggedIn={Boolean(query.data?.currentUser)} logout={handleLogout} />
-      <ErrorBoundary>
-        {typeof children === "function"
-          ? children({ currentUser: query.data?.currentUser, logout })
-          : children}
-      </ErrorBoundary>
+      {/*query.data?.currentUser ? <CurrentUserUpdatedSubscription /> : null*/}
+      <Helmet
+        htmlAttributes={{ lang: "en-US" }}
+        defaultTitle={appTitle}
+        titleTemplate={`${appTitle} | %s`}
+      >
+        <title>{title}</title>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="Content-Language" content="en" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+      </Helmet>
+      <Nav currentUser={query.data?.currentUser} />
+      <ErrorBoundary>{children}</ErrorBoundary>
     </>
   );
 }

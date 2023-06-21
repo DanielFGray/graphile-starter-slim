@@ -6,7 +6,7 @@ const fs = require("fs/promises");
 const { htmlToText } = require("html-to-text");
 const nodemailer = require("nodemailer");
 const getTransport = require("../transport");
-const { projectName, fromEmail, legalText } = require("../../src/config");
+const { projectName, fromEmail, legalText } = require("../../package.json");
 
 global.TEST_EMAILS = [];
 

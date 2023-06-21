@@ -5,10 +5,11 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client/react";
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
-import { type RouteObject } from "react-router";
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { makeRoutes } from "../routes";
+import type { ExecuteGraphql } from "../types";
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
+  const { loadErrorMessages, loadDevMessages } = await import("@apollo/client/dev");
   loadErrorMessages();
   loadDevMessages();
 }
@@ -16,7 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
 const container = document.getElementById("root");
 if (!container) throw new Error("no root container found!");
 
-const initialState = JSON.parse(document.getElementById("initialState")?.innerText ?? '{}');
+const initialState = JSON.parse(document.getElementById("initialState")?.innerText ?? "{}");
 
 const apolloClient = new ApolloClient({
   link: ApolloLink.from([
@@ -48,12 +49,8 @@ const apolloClient = new ApolloClient({
   }).restore(initialState),
 });
 
-const routes: RouteObject[] = [
-  { path: "/", index: true, Component: React.lazy(() => import("./Home.jsx")) },
-  { path: "/login", Component: React.lazy(() => import("./login.jsx")) },
-  { path: "/register", Component: React.lazy(() => import("./register.jsx")) },
-  { path: "/settings", Component: React.lazy(() => import("./settings.jsx")) },
-];
+const graphql: ExecuteGraphql = (query, op = {}) => apolloClient.query({ query, ...op });
+const routes = makeRoutes({ graphql }).map(r => ({ ...r, Component: React.lazy(r.Component) }));
 
 const Init = (
   <React.StrictMode>
@@ -66,8 +63,8 @@ const Init = (
 );
 
 if (import.meta.hot || !container?.innerText) {
+  const root = createRoot(container);
   startTransition(() => {
-    const root = createRoot(container);
     root.render(Init);
   });
 } else {

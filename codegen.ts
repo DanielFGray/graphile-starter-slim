@@ -2,7 +2,10 @@ import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema: "./src/generated/schema.graphql",
-  documents: "./src/queries/**/*.graphql",
+  documents: [
+    "./src/queries/**/*.graphql",
+    "./src/client/**/*.tsx"
+  ],
   config: {
     scalars: {
       UUID: "string",
@@ -14,6 +17,8 @@ const config: CodegenConfig = {
     },
   },
   generates: {
+    // "./src/generated/": {
+    //   preset: 'client',
     "./src/generated/index.ts": {
       plugins: [
         {
@@ -25,7 +30,6 @@ const config: CodegenConfig = {
         },
         "typescript",
         "typescript-operations",
-        // "typescript-resolvers",
         "typescript-react-apollo",
         // "typed-document-node",
       ],

@@ -1,6 +1,7 @@
 export * from "./installCSRFProtection";
 export * from "./installCypressServerCommand";
 export * from "./installDatabasePools";
+export * from "./installDevWatchers";
 export * from "./installErrorHandler";
 export * from "./installForceSSL";
 export * from "./installHelmet";

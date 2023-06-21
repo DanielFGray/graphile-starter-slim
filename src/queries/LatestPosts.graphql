@@ -1,12 +1,8 @@
 query LatestPosts {
+  ...SharedLayout_Query
   posts(orderBy: CREATED_AT_DESC) {
     nodes {
-      postId
-      title
-      body
-      score
-      popularity
-      createdAt
+      ...PostFields
     }
   }
 }

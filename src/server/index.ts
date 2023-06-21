@@ -5,7 +5,7 @@ import fs from "node:fs/promises";
 import chalk from "chalk";
 import { getShutdownActions, getUpgradeHandlers, makeApp } from "./app";
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV !== "production";
 
 async function main() {
   // Create our HTTP server

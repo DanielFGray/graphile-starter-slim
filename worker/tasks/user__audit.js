@@ -1,4 +1,4 @@
-const { projectName } = require("../../src/config");
+const { projectName } = require("../../package.json");
 /** @typedef { import("./send_email").SendEmailPayload } SendEmailPayload */
 /** @typedef { import("graphile-worker").Task } Task */
 /** @typedef {

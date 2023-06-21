@@ -7,6 +7,7 @@ import {
   installCSRFProtection,
   installCypressServerCommand,
   installDatabasePools,
+  installDevWatchers,
   installErrorHandler,
   installForceSSL,
   installHelmet,
@@ -143,21 +144,18 @@ export async function makeApp({
   await installSession(app);
   await installCSRFProtection(app);
   await installPassport(app);
-  await installLogging(app);
   if (process.env.FORCE_SSL) {
     await installForceSSL(app);
   }
-  // These are our assets: images/etc; served out of the /@app/server/public folder (if present)
   await installSharedStatic(app);
+  await installLogging(app);
   if (isDev) {
     await installCypressServerCommand(app);
+    await installDevWatchers(app)
   }
   await installPostGraphile(app);
   await installSSR(app);
 
-  /*
-   * Error handling middleware
-   */
   await installErrorHandler(app);
 
   return app;

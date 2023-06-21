@@ -4,6 +4,7 @@ import {
   createStaticRouter,
   StaticRouterProvider as StaticRouter,
 } from "react-router-dom/server";
+// import * as ReactDOMServer from "react-dom/server";
 import { HelmetProvider, type FilledContext } from "react-helmet-async";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
@@ -12,11 +13,12 @@ import { renderToStringWithData } from "@apollo/client/react/ssr";
 import { GraphileApolloLink } from "./GraphileApolloLink";
 import { PostGraphileInstance } from "postgraphile";
 import { execute, hookArgs } from "grafast";
-import { DocumentNode } from "graphql";
-import * as Home from "../client/Home"
-import * as Login from "../client/login"
-import * as Register from "../client/register"
-import * as Settings from "../client/settings"
+import { RouteObject, LoaderFunction, ActionFunction } from "react-router-dom";
+import makeTemplate from 'lodash/template'
+import { makeRoutes } from "../routes";
+import type { ExecuteGraphql } from "../types";
+
+const isDev = process.env.NODE_ENV !== "production";
 
 function createFetchRequest(req: Request) {
   const origin = `${req.protocol}://${req.get("host")}`;
@@ -46,43 +48,36 @@ function createFetchRequest(req: Request) {
   };
 
   if (req.method !== "GET" && req.method !== "HEAD") {
-    init.body = req.body;
+    init.body = req;
+    init.duplex = 'half'
   }
 
   return new Request(url.href, init);
 }
 
 type RenderArgs = {
-  url: string;
+  template: string;
   req: Request;
   res: Response;
   pgl: PostGraphileInstance;
 };
 
-const routes = [
-  { path: "/", index: true, Component: Home.default },
-  { path: "/login", Component: Login.default },
-  { path: "/register", Component: Register.default },
-  { path: "/settings", Component: Settings.default },
-];
+const routes = Promise.all(makeRoutes().map(async r => {
+  const Component = await r.Component()
+  console.log('imported', r.path)
+  const route: RouteObject = { ...r, Component: Component.default };
+  if ("loader" in Component) route.loader = Component.loader as LoaderFunction;
+  if ("action" in Component) route.action = Component.action as ActionFunction;
+  return route;
+}));
 
-const handler = createStaticHandler(routes);
-
-export async function render({ req, res, pgl }: RenderArgs) {
-  async function graphql(document, {
-    variables: variableValues,
-    operationName,
-  }: {
-    query: DocumentNode;
-    variables?: { [variable: string]: unknown };
-    operationName?: string;
-  }) {
+export async function render({ req, res, pgl, template }: RenderArgs) {
+  const graphql: ExecuteGraphql = async (document, { variables } = {}) => {
     const schema = await pgl.getSchema();
     const args = {
       schema,
       document,
-      variableValues,
-      operationName,
+      variableValues: variables,
     };
     await hookArgs(args, pgl.getResolvedPreset(), {
       node: { req, res },
@@ -90,6 +85,7 @@ export async function render({ req, res, pgl }: RenderArgs) {
     });
     return await execute(args);
   }
+  const handler = createStaticHandler(await routes);
   const routerCtx = await handler.query(createFetchRequest(req), { requestContext: { graphql } });
   const router = createStaticRouter(handler.dataRoutes, routerCtx);
 
@@ -111,13 +107,32 @@ export async function render({ req, res, pgl }: RenderArgs) {
     </React.StrictMode>
   );
 
-  const appHtml = await renderToStringWithData(Init);
-  const appData = apolloClient.extract();
-  const { helmet } = helmetCtx as FilledContext;
+  const html: string = await renderToStringWithData(Init);
+  const data = apolloClient.extract();
 
-  return {
-    appHtml,
-    appData,
-    helmet,
-  };
+  res.format({
+    json() {
+      res.json(data);
+    },
+    html() {
+      const { helmet } = helmetCtx as FilledContext;
+      const meta = [
+        helmet?.title.toString(),
+        helmet?.priority.toString(),
+        helmet?.meta.toString(),
+        // helmet?.link.toString(),
+        // helmet?.script.toString(),
+      ].join("\n");
+      res
+        .status(200)
+        .set("Content-Type", "text/html")
+        .end(
+          makeTemplate(template)({
+            ssrOutlet: html,
+            ssrData: JSON.stringify(data, null, isDev ? 2 : undefined),
+            meta,
+          }),
+        );
+    },
+  });
 }

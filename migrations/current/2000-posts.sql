@@ -8,13 +8,14 @@ create type app_public.privacy as enum(
 -------------------------------------------------------------------------------
 
 create table app_public.posts (
-  post_id text primary key not null generated always as (id_encode(int_id)) stored,
-  int_id int generated always as identity (start 1000),
-  user_id uuid not null references app_public.users,
+  -- id text primary key not null generated always as (id_encode(int_id)) stored,
+  -- int_id int generated always as identity (start 1000),
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references app_public.users on delete cascade default app_public.current_user_id(),
   privacy app_public.privacy not null default 'public',
-  title text,
-  body text not null check (length(body) between 1 and 2000),
-  tags app_public.tag[] not null default '{}',
+  title text not null check (length(title) between 1 and 200),
+  body text not null check (length(body) between 1 and 16384),
+  tags app_public.tag[] not null default '{}' check(array_length(tags, 1) > 0),
   search tsvector not null generated always as (
     to_tsvector('english', coalesce(title || ' ' || body, ''))
   ) stored,
@@ -70,8 +71,9 @@ create trigger _500_gql_update
 -------------------------------------------------------------------------------
 
 create table app_public.posts_votes (
-  post_id text not null references app_public.posts on delete cascade,
-  user_id uuid not null references app_public.users on delete cascade,
+  -- post_id text not null references app_public.posts on delete cascade,
+  post_id uuid not null references app_public.posts on delete cascade,
+  user_id uuid not null references app_public.users on delete cascade default app_public.current_user_id(),
   vote app_public.vote_type not null,
   created_at timestamptz not null default now(),
   primary key (post_id, user_id)
@@ -106,9 +108,10 @@ grant
 -------------------------------------------------------------------------------
 
 create table app_public.comments (
-  comment_id uuid primary key default gen_random_uuid(),
-  post_id text not null references app_public.posts on delete cascade,
-  user_id uuid references app_public.users on delete set null,
+  id uuid primary key default gen_random_uuid(),
+  -- post_id text not null references app_public.posts on delete cascade,
+  post_id uuid not null references app_public.posts on delete cascade,
+  user_id uuid references app_public.users on delete set null default app_public.current_user_id(),
   parent_id uuid references app_public.comments on delete cascade,
   body text not null,
   search tsvector not null generated always as (to_tsvector('english', body)) stored,
@@ -163,7 +166,7 @@ create trigger _500_gql_update
 
 create table app_public.comments_votes (
   comment_id uuid not null references app_public.comments on delete cascade,
-  user_id uuid not null references app_public.users on delete cascade,
+  user_id uuid not null references app_public.users on delete set null default app_public.current_user_id(),
   vote app_public.vote_type not null,
   created_at timestamptz not null default now(),
   primary key (comment_id, user_id)
@@ -219,7 +222,7 @@ create or replace function app_public.posts_current_user_voted(
   from
     app_public.posts_votes v
   where
-    v.post_id = post.post_id
+    v.post_id = post.id
     and v.user_id = app_public.current_user_id()
 $$ language sql stable security definer set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.posts_current_user_voted(app_public.posts) to :DATABASE_VISITOR;
@@ -237,7 +240,7 @@ create or replace function app_public.posts_score(
   from
     app_public.posts_votes v
   where
-    v.post_id = post.post_id
+    v.post_id = post.id
 $$ language sql stable set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.posts_score(app_public.posts) to :DATABASE_VISITOR;
 
@@ -257,7 +260,7 @@ create or replace function app_public.comments_current_user_voted(
   from
     app_public.comments_votes v
   where
-    v.comment_id = comment.comment_id
+    v.comment_id = comment.id
     and v.user_id = app_public.current_user_id()
 $$ language sql stable security definer set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.comments_current_user_voted(app_public.comments) to :DATABASE_VISITOR;
@@ -275,7 +278,7 @@ create or replace function app_public.comments_score(
   from
     app_public.comments_votes v
   where
-    v.comment_id = comment.comment_id
+    v.comment_id = comment.id
 $$ language sql stable set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.comments_score(app_public.comments) to :DATABASE_VISITOR;
 

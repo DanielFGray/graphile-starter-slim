@@ -21,7 +21,7 @@ module.exports = async (inPayload, { addJob }) => {
     template: "delete_account.mjml",
     variables: {
       token,
-      deleteAccountLink: `${process.env.RAZZLE_ROOT_URL}/settings/delete?token=${encodeURIComponent(
+      deleteAccountLink: `${process.env.ROOT_URL}/settings/delete?delete_token=${encodeURIComponent(
         token,
       )}`,
     },
