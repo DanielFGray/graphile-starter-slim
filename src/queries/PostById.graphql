@@ -1,0 +1,12 @@
+query PostById($id: String!) {
+  ...SharedLayout_Query
+  post(id: $id) {
+    ...PostFields
+    comments(orderBy: CREATED_AT_DESC, first: 100) {
+      totalCount
+      nodes {
+        ...CommentFields
+      }
+    }
+  }
+}

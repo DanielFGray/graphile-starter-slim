@@ -1,8 +1,10 @@
 mutation CreatePost($title: String!, $body: String!, $tags: [Tag]!) {
   createPost(input: { post: { title: $title, body: $body, tags: $tags } }) {
     post {
-      id
-      createdAt
+      ...PostFields
+      comments {
+        totalCount
+      }
     }
   }
 }

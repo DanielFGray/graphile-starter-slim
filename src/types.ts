@@ -9,8 +9,8 @@ export type ExecuteGraphql = <Result, Variables extends { [key: string]: unknown
 
 export type ActionArgs = Omit<ActionFunctionArgs, "context"> & {
   context: { graphql: ExecuteGraphql };
-}
+};
 
 export type LoaderArgs = Omit<LoaderFunctionArgs, "context"> & {
   context: { graphql: ExecuteGraphql };
-}
+};

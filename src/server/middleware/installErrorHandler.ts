@@ -48,7 +48,7 @@ function parseError(
 let errorPageTemplate: TemplateExecutor;
 function getErrorPage({ message }: ParsedError) {
   if (!errorPageTemplate || isDev) {
-    const errorPath = path.resolve("src/client/error.html")
+    const errorPath = path.resolve("src/client/error.html");
     errorPageTemplate = template(fs.readFileSync(errorPath, "utf8"));
   }
 

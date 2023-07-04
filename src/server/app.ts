@@ -151,7 +151,7 @@ export async function makeApp({
   await installLogging(app);
   if (isDev) {
     await installCypressServerCommand(app);
-    await installDevWatchers(app)
+    await installDevWatchers(app);
   }
   await installPostGraphile(app);
   await installSSR(app);

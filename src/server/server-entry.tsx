@@ -14,8 +14,8 @@ import { GraphileApolloLink } from "./GraphileApolloLink";
 import { PostGraphileInstance } from "postgraphile";
 import { execute, hookArgs } from "grafast";
 import { RouteObject, LoaderFunction, ActionFunction } from "react-router-dom";
-import makeTemplate from 'lodash/template'
-import { makeRoutes } from "../routes";
+import makeTemplate from "lodash/template";
+import { routes } from "../routes";
 import type { ExecuteGraphql } from "../types";
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -49,7 +49,7 @@ function createFetchRequest(req: Request) {
 
   if (req.method !== "GET" && req.method !== "HEAD") {
     init.body = req;
-    init.duplex = 'half'
+    init.duplex = "half";
   }
 
   return new Request(url.href, init);
@@ -62,14 +62,14 @@ type RenderArgs = {
   pgl: PostGraphileInstance;
 };
 
-const routes = Promise.all(makeRoutes().map(async r => {
-  const Component = await r.Component()
-  console.log('imported', r.path)
-  const route: RouteObject = { ...r, Component: Component.default };
-  if ("loader" in Component) route.loader = Component.loader as LoaderFunction;
-  if ("action" in Component) route.action = Component.action as ActionFunction;
-  return route;
-}));
+const serverRoutes = Promise.all(
+  routes.map(async r => {
+    const Component = await r.Component();
+    const route: RouteObject = { ...r, ...Component, Component: Component.default };
+    console.log(...Object.entries(route));
+    return route;
+  }),
+);
 
 export async function render({ req, res, pgl, template }: RenderArgs) {
   const graphql: ExecuteGraphql = async (document, { variables } = {}) => {
@@ -84,13 +84,12 @@ export async function render({ req, res, pgl, template }: RenderArgs) {
       expressv4: { req, res },
     });
     return await execute(args);
-  }
-  const handler = createStaticHandler(await routes);
+  };
+  const handler = createStaticHandler(await serverRoutes);
   const routerCtx = await handler.query(createFetchRequest(req), { requestContext: { graphql } });
   const router = createStaticRouter(handler.dataRoutes, routerCtx);
-
   const apolloClient = new ApolloClient({
-    mode: "ssr",
+    ssrMode: true,
     cache: new InMemoryCache(),
     link: new GraphileApolloLink({ req, res, pgl }),
   });

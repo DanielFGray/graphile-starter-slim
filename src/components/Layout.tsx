@@ -24,7 +24,7 @@ function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] })
   const logout = useLogout();
   return (
     <header>
-      <nav className="border-b text-primary-100 bg-primary-800 border-primary-540 mb-4 tracking-tight">
+      <nav className="border-primary-540 mb-4 border-b border-primary-500 bg-primary-800 tracking-tight text-primary-100">
         <ul className="flex flex-row justify-between gap-4 p-4">
           <div>
             <li>
@@ -59,8 +59,8 @@ function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] })
             ) : (
               <>
                 <li>
-                  <NavLink to="/signup" className={NavStyles({isActive:true})}>
-                      create an account
+                  <NavLink to="/signup" className={NavStyles({ isActive: true })}>
+                    create an account
                   </NavLink>
                 </li>
                 <li>

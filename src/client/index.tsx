@@ -1,18 +1,12 @@
-import React, { startTransition } from "react";
+import React, { Suspense, startTransition } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client/react";
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
-import { makeRoutes } from "../routes";
-import type { ExecuteGraphql } from "../types";
-
-if (process.env.NODE_ENV !== "production") {
-  const { loadErrorMessages, loadDevMessages } = await import("@apollo/client/dev");
-  loadErrorMessages();
-  loadDevMessages();
-}
+import { routes } from "../routes";
+// import type { ExecuteGraphql } from "../types";
 
 const container = document.getElementById("root");
 if (!container) throw new Error("no root container found!");
@@ -45,18 +39,28 @@ const apolloClient = new ApolloClient({
       Query: {
         queryType: true,
       },
+      posts: {
+        fields: {
+          nodes: {
+            merge(existing = [], incoming: any[]) {
+              return [...existing, ...incoming];
+            },
+          },
+        },
+      },
     },
   }).restore(initialState),
 });
 
-const graphql: ExecuteGraphql = (query, op = {}) => apolloClient.query({ query, ...op });
-const routes = makeRoutes({ graphql }).map(r => ({ ...r, Component: React.lazy(r.Component) }));
+const clientRoutes = routes.map(r => ({ ...r, Component: React.lazy(r.Component) }));
 
 const Init = (
   <React.StrictMode>
     <ApolloProvider client={apolloClient}>
       <HelmetProvider>
-        <RouterProvider router={createBrowserRouter(routes)} />
+        <Suspense>
+          <RouterProvider router={createBrowserRouter(clientRoutes)} />
+        </Suspense>
       </HelmetProvider>
     </ApolloProvider>
   </React.StrictMode>

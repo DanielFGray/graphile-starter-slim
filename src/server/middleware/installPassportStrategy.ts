@@ -74,11 +74,11 @@ export async function installPassportStrategy(
     strategyConfig: any;
     authenticateConfig?: any;
     getUserInformation: (info: {
-      profile: any,
-      accessToken: string,
-      refreshToken: string,
-      extra: any,
-      req: Request,
+      profile: any;
+      accessToken: string;
+      refreshToken: string;
+      extra: any;
+      req: Request;
     }) => UserSpec | Promise<UserSpec>;
     tokenNames: string[];
     hooks?: {

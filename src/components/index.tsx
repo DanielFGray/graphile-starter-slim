@@ -1,164 +1,227 @@
-import React, { useState, useCallback, useContext, HTMLInputTypeAttribute } from "react";
-import { extractError, getCodeFromError, uniq } from "../lib";
+import React, { useState, useCallback, useContext } from "react";
+import { ensureArray, extractError, getCodeFromError, uniq } from "../lib";
 
 export * from "./Layout";
 
-export function Container({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+type ElementType<P> = string | ((a: P) => React.ReactNode);
+
+export function Card<T = "div">({
+  children,
+  className,
+  as: As = "div",
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+  as?: ElementType<T>;
+} & React.ComponentPropsWithoutRef<T>) {
   return (
-    <div className={clsx("flex flex-col gap-4", className)} {...props}>
+    <As
+      className={clsx("bg-gray-100 rounded p-4 shadow-md dark:bg-gray-700 dark:text-primary-50", className)}
+      {...props}
+    >
       {children}
-    </div>
+    </As>
   );
 }
 
-export const Danger = React.forwardRef(function Danger(
-  { children, as: C = "span", className, ...props },
-  ref,
-) {
+export function Container<T>({
+  children,
+  className,
+  as: As = "div",
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+  as?: ElementType<T>;
+}) {
   return (
-    <C className={clsx("text-red-700", className)} {...props} ref={ref}>
+    <As className={clsx("flex flex-col gap-4 px-4", className)} {...props}>
       {children}
-    </C>
+    </As>
   );
-});
+}
 
-type ButtonProps = {
-  variant?: "danger" | "primary" | "default";
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, variant = "default", ...props }: ButtonProps,
-  ref,
-) {
+export function Danger({
+  children,
+  as: As = "span",
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+  as?: ElementType;
+}) {
+  return (
+    <As className={clsx("text-red-700", className)} {...props}>
+      {children}
+    </As>
+  );
+}
+
+const buttonVariants = {
+  primary: "bg-primary-600 text-primary-100 hover:bg-primary-500",
+  danger: "bg-red-100 text-red-900 border border-red-300 hover:bg-red-200",
+  default: "bg-primary-200 text-primary-900 hover:bg-primary-100",
+} as const;
+
+export function Button({
+  className,
+  variant = "default",
+  ...props
+}: { variant?: keyof typeof buttonVariants } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
       className={clsx(
-        variant === "primary" ? "bg-primary-600 text-primary-50 shadow-md hover:bg-primary-700 hover:shadow-sm"
-        : variant === "danger" ? "bg-red-100 text-red-900 border border-red-300 hover:bg-red-200"
-        : "bg-primary-100 border text-primary-900 border-primary-600 hover:bg-primary-50",
-        "p-2",
+        buttonVariants[variant],
+        `
+          rounded
+          border-0
+          p-2
+          font-semibold
+          shadow
+          hover:-translate-y-px
+          hover:shadow-lg
+          focus:translate-x-0
+          focus:outline-primary-700
+          focus:ring-1
+          focus:ring-primary-700
+          dark:bg-primary-500
+          dark:text-primary-50
+        `.replace(/\s+/g, " "),
         className,
       )}
-      ref={ref}
     >
       {props.children}
     </button>
   );
-});
+}
 
-type InputProps =
-  | ({
-      type: HTMLInputTypeAttribute;
-    } & React.InputHTMLAttributes<HTMLInputElement>)
+export function Input({
+  className,
+  ...props
+}:
+  | React.InputHTMLAttributes<HTMLInputElement>
   | ({
       type: "textarea";
-    } & React.TextareaHTMLAttributes<HTMLTextAreaElement>);
-export const Input = React.forwardRef<
-  React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  InputProps
->(function Input({ className, ...props }: InputProps, ref) {
-  return props.type === "textarea" ? (
-    <textarea
-      {...props}
-      ref={ref}
-      className={clsx("form-textarea w-full border border-1 shadow border-primary-600", className)}
-    >
+    } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)) {
+  const commonClasses = `
+    bg-primary-50
+    border-0
+    dark:bg-primary-600
+    dark:hover:outline-primary-400
+    dark:outline-primary-500
+    dark:placeholder:text-primary-400
+    dark:text-primary-100
+    focus:ring-2
+    focus:ring-inset
+    focus:ring-primary-400
+    focus:shadow-none
+    hover:outline-primary-400
+    outline
+    outline-1
+    outline-primary-300
+    rounded
+    shadow-md
+    text-sm
+    w-full
+  `.replace(/\s+/g, " ");
+  return props.type ===
+    "textarea" /* @ts-expect-error polymorphism is a pain to type properly */ ? (
+    <textarea {...props} className={clsx("form-textarea", commonClasses, className)}>
       {props.value}
     </textarea>
   ) : (
-    <input
-      {...props}
-      ref={ref}
+    /* @ts-expect-error polymorphism is a pain to type properly */
+    <input {...props} className={clsx("form-input block", commonClasses, className)} />
+  );
+}
+
+export function Legend<T>({
+  className = "",
+  as: As = "legend",
+  ...props
+}: {
+  as?: ElementType<T>;
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>) {
+  return (
+    <As
       className={clsx(
-        "form-input block w-full border border-1 shadow border-primary-600",
+        "-rotate-1 -skew-y-1 p-2 font-medium italic shadow-md",
+        !/\btext-/.test(className) && "text-primary-800",
+        !/\bbg-/.test(className) && "bg-primary-50",
+        "dark:bg-primary-600 dark:text-primary-100",
+
         className,
       )}
-    />
-  );
-});
-
-export function Legend({
-  className = "",
-  ...props
-}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>) {
-  return (
-    <legend className={clsx("p-2 -rotate-3 text-primary-900 bg-gray-200", className)} {...props}>
+      {...props}
+    >
       {props.children}
-    </legend>
+    </As>
   );
 }
 
-export function Fieldset({
-  className = "",
+const formCtx = React.createContext<
+  | {
+      setErrors(a: Array<string> | null): void;
+      errors: Array<string> | null | undefined;
+    }
+  | undefined
+>(undefined);
+
+export function Form({
+  children,
+  onSubmit,
   ...props
-}: React.DetailedHTMLProps<
-  React.FieldsetHTMLAttributes<HTMLFieldSetElement>,
-  HTMLFieldSetElement
->) {
-  return (
-    <fieldset className={clsx("bg-gray-100 dark:bg-gray-700 mx-4 p-4", className)} {...props}>
-      {props.children}
-    </fieldset>
-  );
-}
-
-const formCtx = React.createContext<{
-  errors: null | Array<string>;
-}>({ errors: null });
-
-type FormProps = {
+}: {
   children: React.ReactNode | ((props: { errors: Array<string> | null }) => React.ReactNode);
   onSubmit: (args: {
     event: React.FormEvent<HTMLFormElement>;
     setErrors: (err: Error | null | string | Array<string>) => void;
-    values: Record<keyof T, string>;
+    values: Record<string, any>;
   }) => Promise<void> | void;
-} & Omit<React.FormHTMLAttributes<HTMLFormElement>, "onSubmit" | "children">;
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(function Form(
-  { children, onSubmit, ...props }: FormProps,
-  ref,
-): React.ReactElement {
-  const [errors, setErrors] = useState<null | Array<string>>();
-  const concatErrors = useCallback((str: Error | null | string | Array<string>) => {
-    setErrors(s => {
+} & Omit<React.FormHTMLAttributes<HTMLFormElement>, "onSubmit" | "children">) {
+  const [errors, _setErrors] = useState<null | Array<string>>();
+  const setErrors = useCallback((str: Error | null | string | Array<string>) => {
+    _setErrors(s => {
       if (str == null) return null;
       return (s || []).concat(str instanceof Error ? str.message : str);
     });
   }, []);
 
   return (
-    <formCtx.Provider value={{ setErrors: concatErrors, errors }}>
+    <formCtx.Provider value={{ setErrors, errors }}>
       <form
-        ref={ref}
         {...props}
         onSubmit={async event => {
           event.preventDefault();
-          concatErrors(null);
-          const values = Object.fromEntries(new FormData(event.currentTarget)) as Record<
-            keyof T,
-            string
-          >;
+          setErrors(null);
+          const values: Record<string, string | File> = {};
+          for (const [k, x] of new FormData(event.currentTarget)) {
+            values[k] = values[k] ? [].concat(values[k], x) : x;
+          }
           try {
-            await onSubmit({ event, values, setErrors: concatErrors });
+            await onSubmit({ event, values, setErrors });
           } catch (err) {
             const code = getCodeFromError(err);
             switch (code) {
               case "CREDS":
-                concatErrors("Incorrect username or password");
+                setErrors("Incorrect username or password");
                 break;
               case "MODAT":
-                concatErrors("Email is required");
+                setErrors("Email is required");
                 break;
               case "WEAKP":
-                concatErrors("Password is too weak or too common, please make it stronger");
+                setErrors("Password is too weak or too common, please make it stronger");
                 break;
               case "EMTKN":
-                concatErrors(
+                setErrors(
                   "An account with this email address has already been registered, consider using the 'Forgot passphrase' function.",
                 );
                 break;
               case "NUNIQ":
-                concatErrors(
+                setErrors(
                   "An account with this username has already been registered, please try a different username.",
                 );
                 break;
@@ -172,22 +235,17 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(function Form(
       </form>
     </formCtx.Provider>
   );
-});
+}
 
-export function FormErrors(props: { errors?: Array<null | undefined | string> }) {
+export function FormErrors(props: { errors?: null | string | Array<string> }) {
   const ctx = useContext(formCtx);
-  if (!ctx.errors) return null;
-  return (
-    <>
-      {uniq(ctx.errors.concat(props.errors ? props.errors : [])).map(err => {
-        return (
-          <Danger as="div" key={err} className="mt-4">
-            {err}
-          </Danger>
-        );
-      })}
-    </>
-  );
+  if (!(ctx?.errors || props.errors)) return null;
+  const errs = uniq(ensureArray(ctx?.errors).concat(ensureArray(props.errors)));
+  return errs.map(err => (
+    <Danger as="div" key={err}>
+      {err}
+    </Danger>
+  ));
 }
 
 export function FormRow({
@@ -206,7 +264,8 @@ export function FormRow({
 }
 
 /**
- * Sort of like the `classnames` module, but a bit simpler
+ * Sort of like the
+ `classnames` module, but a bit simpler
  * @param {...Array<any>} args
  * @returns {string} string
  */
@@ -259,4 +318,8 @@ export function SocialLogin({
       ))}
     </div>
   );
+}
+
+export function Spinner() {
+  return 'Loading...'
 }

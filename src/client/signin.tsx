@@ -4,7 +4,7 @@ import { useApolloClient } from "@apollo/client";
 import { useSharedLayoutQuery, useLoginMutation } from "../generated";
 import {
   Layout,
-  Fieldset,
+  Card,
   Input,
   FormRow,
   Form,
@@ -36,12 +36,12 @@ export default function Login() {
         }}
       >
         {({ errors }) => (
-          <Fieldset className="p-16">
+          <Card as="fieldset">
             <Legend>log in</Legend>
-              <div className="pb-4 border-b border-primary-300">
-                <SocialLogin label="log in" />
-              </div>
-              <Container className="mt-4">
+            <div className="border-b border-primary-300 pb-4">
+              <SocialLogin label="log in" />
+            </div>
+            <Container className="mt-4">
               <FormRow label={<span>username:</span>}>
                 <Input type="text" name="username" placeholder="or email" required />
               </FormRow>
@@ -49,12 +49,14 @@ export default function Login() {
                 <Input type="password" name="password" placeholder="********" required />
               </FormRow>
               <div className="flex flex-col gap-4">
-                <Button type="submit">log in</Button>
+                <Button variant="primary" type="submit">
+                  log in
+                </Button>
                 <FormErrors />
                 {errors ? <Link to="/forgot">forgot your password?</Link> : null}
               </div>
             </Container>
-          </Fieldset>
+          </Card>
         )}
       </Form>
     </Layout>

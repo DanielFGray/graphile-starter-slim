@@ -11,7 +11,7 @@ async function getTemplateFile() {
 
 export async function installSSR(app: Express) {
   let template = await getTemplateFile();
-  const viteDevServer = app.get("viteDevServer")
+  const viteDevServer = app.get("viteDevServer");
   if (isDev) {
     app.use(viteDevServer.middlewares);
   } else {

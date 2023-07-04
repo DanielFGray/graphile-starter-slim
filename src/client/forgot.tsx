@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import {
   Button,
   Container,
-  Danger,
-  Fieldset,
+  Card,
   Form,
   FormRow,
   Input,
@@ -13,10 +12,8 @@ import {
 } from "../components";
 import { useSharedLayoutQuery, useForgotPasswordMutation } from "../generated";
 
-export const path = "/forgot";
-
 export default function ForgotPassword() {
-  const query = useSharedLayoutQuery()
+  const query = useSharedLayoutQuery();
   const [forgotPassword] = useForgotPasswordMutation();
   const [successfulEmail, setSuccessfulEmail] = useState<string | null>(null);
   return (
@@ -34,7 +31,7 @@ export default function ForgotPassword() {
             setSuccessfulEmail(email);
           }}
         >
-          <Fieldset>
+          <Card as="fieldset">
             <Legend>forgot password</Legend>
             <Container>
               <FormRow label="email:">
@@ -45,7 +42,7 @@ export default function ForgotPassword() {
               </div>
               <FormErrors />
             </Container>
-          </Fieldset>
+          </Card>
         </Form>
       )}
     </Layout>

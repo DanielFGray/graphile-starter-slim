@@ -1,13 +1,10 @@
-fragment PostFields on Post {
+fragment CommentFields on Comment {
   id
   user {
     username
   }
-  title
   body
-  tags
   score
-  popularity
   createdAt
   updatedAt
 }

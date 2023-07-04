@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:15-alpine # default postgres
-    # build: postgres/          # custom postgres build with extensions
+    # image: postgres:15-alpine # default postgres
+    build: postgres/          # custom postgres build with extensions
     environment:
       - POSTGRES_USER=${ROOT_DATABASE_USER}
       - POSTGRES_PASSWORD=${ROOT_DATABASE_PASSWORD}

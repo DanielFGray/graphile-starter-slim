@@ -8,9 +8,9 @@ create type app_public.privacy as enum(
 -------------------------------------------------------------------------------
 
 create table app_public.posts (
-  -- id text primary key not null generated always as (id_encode(int_id)) stored,
-  -- int_id int generated always as identity (start 1000),
-  id uuid primary key default gen_random_uuid(),
+  id text primary key not null generated always as (id_encode(int_id)) stored,
+  int_id int generated always as identity (start 1000),
+  -- id uuid primary key default gen_random_uuid(),
   user_id uuid not null references app_public.users on delete cascade default app_public.current_user_id(),
   privacy app_public.privacy not null default 'public',
   title text not null check (length(title) between 1 and 200),
@@ -34,7 +34,12 @@ create policy select_own_and_public on app_public.posts
 
 create policy delete_posts_as_admin on app_public.posts
   for delete using (exists (
-    select 1 from app_public.users where id = app_public.current_user_id() and role = 'admin'
+    select 1
+    from
+      app_public.users
+    where
+      id = app_public.current_user_id()
+      and role = 'admin'
   ));
 
 create policy insert_own on app_public.posts
@@ -71,8 +76,8 @@ create trigger _500_gql_update
 -------------------------------------------------------------------------------
 
 create table app_public.posts_votes (
-  -- post_id text not null references app_public.posts on delete cascade,
-  post_id uuid not null references app_public.posts on delete cascade,
+  post_id text not null references app_public.posts on delete cascade,
+  -- post_id uuid not null references app_public.posts on delete cascade,
   user_id uuid not null references app_public.users on delete cascade default app_public.current_user_id(),
   vote app_public.vote_type not null,
   created_at timestamptz not null default now(),
@@ -109,8 +114,8 @@ grant
 
 create table app_public.comments (
   id uuid primary key default gen_random_uuid(),
-  -- post_id text not null references app_public.posts on delete cascade,
-  post_id uuid not null references app_public.posts on delete cascade,
+  post_id text not null references app_public.posts on delete cascade,
+  -- post_id uuid not null references app_public.posts on delete cascade,
   user_id uuid references app_public.users on delete set null default app_public.current_user_id(),
   parent_id uuid references app_public.comments on delete cascade,
   body text not null,
@@ -119,9 +124,9 @@ create table app_public.comments (
   updated_at timestamptz not null default now()
 );
 
-create index on app_public.comments (post_id);
-create index on app_public.comments (user_id);
+create index on app_public.comments (post_id, user_id);
 create index on app_public.comments (parent_id);
+create index on app_public.comments (created_at desc);
 
 alter table app_public.comments enable row level security;
 
@@ -249,7 +254,7 @@ create or replace function app_public.posts_popularity(
 ) returns float as $$
   -- https://medium.com/hacking-and-gonzo/how-hacker-news-ranking-algorithm-works-1d9b0cf2c08d
   select (app_public.posts_score(post) - 1) / pow((extract(epoch from (now() - post.created_at)) / 3600) + 2, 1.8)
-$$ language sql stable;
+$$ language sql stable set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.posts_popularity(app_public.posts) to :DATABASE_VISITOR;
 
 create or replace function app_public.comments_current_user_voted(
@@ -290,9 +295,9 @@ create or replace function app_public.comments_popularity(
 $$ language sql stable set search_path to pg_catalog, public, pg_temp;
 grant execute on function app_public.comments_popularity(app_public.comments) to :DATABASE_VISITOR;
 
-create function app_public.posts_by_tags(
-  tags text[]
-) returns app_public.posts as $$
-  select * from app_public.posts p where p.tags @> tags::app_public.tag[]
-$$ language sql stable set search_path to pg_catalog, public, pg_temp;
-grant execute on function app_public.posts_by_tags(text[]) to :DATABASE_VISITOR;
+-- create function app_public.posts_by_tags(
+--   tags text[]
+-- ) returns app_public.posts as $$
+--   select * from app_public.posts p where p.tags @> tags::app_public.tag[]
+-- $$ language sql stable set search_path to pg_catalog, public, pg_temp;
+-- grant execute on function app_public.posts_by_tags(text[]) to :DATABASE_VISITOR;

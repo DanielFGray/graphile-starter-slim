@@ -18,10 +18,11 @@ export async function useLogout() {
           navigate("/logout");
         });
     });
-  }
+  };
 }
 
-export function ensureArray<T>(input: T | Array<T>): Array<T> {
+export function ensureArray<T>(input: T | null | undefined | Array<T>): Array<T> {
+  if (!input) return [];
   return Array.isArray(input) ? input : [input];
 }
 

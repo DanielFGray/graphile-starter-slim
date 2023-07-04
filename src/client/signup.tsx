@@ -4,7 +4,7 @@ import { useApolloClient } from "@apollo/client";
 import { useSharedLayoutQuery, useRegisterMutation } from "../generated";
 import {
   Layout,
-  Fieldset,
+  Card,
   Input,
   Form,
   FormRow,
@@ -44,9 +44,9 @@ export default function SignUp() {
           });
         }}
       >
-        <Fieldset className="p-16">
+        <Card as="fieldset">
           <Legend>sign up</Legend>
-          <div className="pb-4 border-b border-primary-300">
+          <div className="border-b border-primary-300 pb-4">
             <SocialLogin label="sign up" />
           </div>
           <Container className="mt-4">
@@ -102,7 +102,7 @@ export default function SignUp() {
               <FormErrors />
             </div>
           </Container>
-        </Fieldset>
+        </Card>
       </Form>
     </Layout>
   );

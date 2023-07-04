@@ -22,19 +22,22 @@ export default function Verify() {
 
   return (
     <Layout query={query}>
-      <Container className="p-4 items-center">
+      <Container className="items-center p-4">
         {!token ? (
-          <Form className="space-y-4" onSubmit={({ values }) => sendRequest({ id, token: values.token })}>
+          <Form
+            className="space-y-4"
+            onSubmit={({ values }) => sendRequest({ id, token: values.token })}
+          >
             <p>Please enter your email verification code</p>
             <Input type="text" name="token" defaultValue={token ?? ""} className="max-w-sm" />
             <FormErrors />
             <Button variant="primary">Submit</Button>
           </Form>
         ) : mutation.data?.verifyEmail.success ? (
-          <div className="bg-gray-100 p-8">Thank you for verifying your email address. You may now close this window.</div>
-        ) : (
-          null
-        )}
+          <div className="bg-gray-100 p-8">
+            Thank you for verifying your email address. You may now close this window.
+          </div>
+        ) : null}
       </Container>
     </Layout>
   );

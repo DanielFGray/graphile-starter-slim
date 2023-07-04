@@ -15,7 +15,7 @@ import {
 } from "../generated";
 import {
   Layout,
-  Fieldset,
+  Card,
   Input,
   Form,
   FormRow,
@@ -25,31 +25,37 @@ import {
   Container,
   Legend,
   SocialLogin,
+  Spinner,
 } from "../components";
 import { useLogout } from "../lib";
 
 export default function SettingsPage() {
   const query = useSettingsQuery();
+  if (!query.data) return <Spinner />;
   return (
     <Layout query={query} title="Settings" forbidWhen={auth => auth.LOGGED_OUT}>
-      <Container className="max-w-4xl mx-auto mb-4">
-        {/*<ul className="flex xl:flex-col p-4 justify-around xl:justify-start flex-row gap-1 xl:gap-4 items-middle xl:w-1/4 xl:p-8">
+      <Container className="xl:flex-row">
+        <ul className="items-middle flex flex-row justify-around gap-1 rounded bg-primary-100 p-4 dark:bg-primary-700 xl:w-1/4 xl:flex-col xl:justify-start xl:gap-4 xl:p-8">
           <li>
             <NavLink to="profile">profile</NavLink>
           </li>
           <li>
-            <NavLink to="accounts">accounts</NavLink>
+            <NavLink to="password">password</NavLink>
           </li>
           <li>
-            <NavLink to="email">email</NavLink>
+            <NavLink to="accounts">linked accounts</NavLink>
           </li>
           <li>
-            <NavLink to="delete">delete</NavLink>
+            <NavLink to="email">emails</NavLink>
           </li>
-        </ul>*/}
-        <div className="flex-grow">
+          <li>
+            <NavLink to="delete">delete accounts</NavLink>
+          </li>
+        </ul>
+        <div className="max-w-4xl flex-grow">
           <Routes>
             <Route path="profile" element={<UserProfile data={query.data} />} />
+            <Route path="password" element={<PasswordSettings data={query.data} />} />
             <Route path="email" element={<EmailSettings data={query.data} />} />
             <Route path="accounts" element={<LinkedAccounts data={query.data} />} />
             <Route path="delete" element={<DeleteAccount />} />
@@ -88,7 +94,7 @@ function UserProfile({ data }: { data: SettingsQuery }) {
         });
       }}
     >
-      <Fieldset>
+      <Card as="fieldset">
         <Legend>profile settings</Legend>
         <Container>
           <FormRow label="username:">
@@ -114,7 +120,7 @@ function UserProfile({ data }: { data: SettingsQuery }) {
           </div>
         </Container>
         <FormErrors />
-      </Fieldset>
+      </Card>
     </Form>
   );
 }
@@ -136,7 +142,7 @@ function PasswordSettings({ data }: { data: SettingsEmailsQuery }) {
         });
       }}
     >
-      <Fieldset>
+      <Card as="fieldset">
         <Legend>password settings</Legend>
         <Container>
           {data?.currentUser?.hasPassword ? (
@@ -157,14 +163,14 @@ function PasswordSettings({ data }: { data: SettingsEmailsQuery }) {
           </div>
         </Container>
         <FormErrors />
-      </Fieldset>
+      </Card>
     </Form>
   );
 }
 
 function EmailSettings({ data }: { data: SettingsEmailsQuery }) {
   return (
-    <Fieldset>
+    <Card as="fieldset">
       <Legend>email settings</Legend>
       <Container>
         <div>
@@ -187,7 +193,7 @@ function EmailSettings({ data }: { data: SettingsEmailsQuery }) {
         </div>
         <AddEmailForm />
       </Container>
-    </Fieldset>
+    </Card>
   );
 }
 
@@ -220,7 +226,14 @@ function Email({
         </div>
       </div>
       <div>
-        {email.isPrimary && <span key="primary_indicator">Primary</span>}
+        {email.isPrimary && (
+          <span
+            className="rounded-md bg-green-300 p-1 text-sm font-bold text-green-900"
+            key="primary_indicator"
+          >
+            Primary
+          </span>
+        )}
         {canDelete && (
           <Button onClick={() => deleteEmail({ variables: { emailId: email.id } })}>Delete</Button>
         )}
@@ -247,8 +260,10 @@ function AddEmailForm() {
   const [showForm, setShowForm] = useState<boolean>(false);
   if (!showForm) {
     return (
-      <div>
-        <Button type="submit" value="Add email" onClick={() => setShowForm(true)} />
+      <div className="grow">
+        <Button type="submit" onClick={() => setShowForm(true)}>
+          Add email
+        </Button>
       </div>
     );
   }
@@ -262,7 +277,7 @@ function AddEmailForm() {
         <Input type="email" name="email" required />
       </FormRow>
       <div>
-        <Button variant="primary" type="submit" value="Add email" />
+        <Button variant="primary" type="submit">Add email</Button>
       </div>
       <FormErrors />
     </Form>
@@ -302,9 +317,9 @@ function UnlinkAccountButton({ id }: { id: string }) {
           </div>
         </div>
       ) : null}
-      <button disabled={deleting} onClick={() => setModalOpen(true)}>
+      <Button disabled={deleting} onClick={() => setModalOpen(true)}>
         Unlink
-      </button>
+      </Button>
       <FormErrors errors={errors} />
     </div>
   );
@@ -312,17 +327,17 @@ function UnlinkAccountButton({ id }: { id: string }) {
 
 function LinkedAccounts({ data }: { data: SettingsQuery }) {
   return (
-    <Fieldset>
+    <Card as="fieldset">
       <Legend>manage linked accounts</Legend>
       {data?.currentUser?.authentications.map(auth => (
-        <div>
+        <div key={auth.id}>
           <strong>{auth.service}</strong>
-          <div>Added ${new Date(Date.parse(auth.createdAt)).toLocaleString()}</div>
+          <div>Added {new Date(Date.parse(auth.createdAt)).toLocaleString()}</div>
           <UnlinkAccountButton key="unlink" id={auth.id} />
         </div>
       ))}
       <SocialLogin next="/settings/accounts" label={service => `Link ${service} account`} />
-    </Fieldset>
+    </Card>
   );
 }
 
@@ -381,41 +396,39 @@ function DeleteAccount() {
     return null;
   }
   return (
-    <form onSubmit={ev => ev.preventDefault()}>
-      <Fieldset>
-        <legend className="p-2 -rotate-3 bg-red-700 text-red-100">danger zone</legend>
-        {token ? (
-          <div>
-            <p>
-              This is it. <b>Press this button and your account will be deleted.</b> We&apos;re
-              sorry to see you go, please don&apos;t hesitate to reach out and let us know why you
-              no longer want your account.
-            </p>
-            <p className="text-right">
-              <Button
-                variant="danger"
-                className="font-bold"
-                onClick={confirmDeletion}
-                disabled={deleting}
-              >
-                PERMANENTLY DELETE MY ACCOUNT
-              </Button>
-            </p>
-          </div>
-        ) : itIsDone ? (
-          <div>
-            You&apos;ve been sent an email with a confirmation link in it, you must click it to
-            confirm that you are the account holder so that you may continue deleting your account.
-          </div>
-        ) : (
+    <Card as="fieldset">
+      <Legend className="bg-red-700 text-red-100">danger zone</Legend>
+      {token ? (
+        <div>
+          <p>
+            This is it. <b>Press this button and your account will be deleted.</b> We&apos;re sorry
+            to see you go, please don&apos;t hesitate to reach out and let us know why you no longer
+            want your account.
+          </p>
           <p className="text-right">
-            <Button variant="danger" onClick={doIt} disabled={doingIt}>
-              I want to delete my account
+            <Button
+              variant="danger"
+              className="font-bold"
+              onClick={confirmDeletion}
+              disabled={deleting}
+            >
+              PERMANENTLY DELETE MY ACCOUNT
             </Button>
           </p>
-        )}
-        <FormErrors errors={[errors]} />
-      </Fieldset>
-    </form>
+        </div>
+      ) : itIsDone ? (
+        <div>
+          You&apos;ve been sent an email with a confirmation link in it, you must click it to
+          confirm that you are the account holder so that you may continue deleting your account.
+        </div>
+      ) : (
+        <p className="text-right">
+          <Button variant="danger" onClick={doIt} disabled={doingIt}>
+            I want to delete my account
+          </Button>
+        </p>
+      )}
+      <FormErrors errors={errors} />
+    </Card>
   );
 }
