@@ -1,8 +1,9 @@
-const colors = require("tailwindcss/colors");
+const colors = require('tailwindcss/colors')
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.tsx", "./src/**/*.html", "./src/**/*.html"],
-  darkMode: "class",
+  content: ['./app/**/*.tsx'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -12,10 +13,9 @@ module.exports = {
     },
   },
   plugins: [
-    require("@danielfgray/tw-heropatterns"),
-    require("@tailwindcss/aspect-ratio"),
-    require("@tailwindcss/forms")({ strategy: "class" }),
-    require("@tailwindcss/line-clamp"),
-    require("@tailwindcss/typography"),
+    require('@danielfgray/tw-heropatterns'),
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
   ],
-};
+}

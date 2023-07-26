@@ -2,13 +2,13 @@ import fs from "node:fs/promises";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import pg from "pg";
 import { makeSchema } from "postgraphile";
-import { getPreset } from "../src/server/graphile.config";
+import { getPreset } from "../server/graphile.config";
 
 const AUTH_DATABASE_URL = process.env.AUTH_DATABASE_URL;
 if (!AUTH_DATABASE_URL) throw new Error("missing AUTH_DATABASE_URL env var");
 
 async function main() {
-  if (await fs.stat("./src/generated/schema.graphql").catch(() => false)) {
+  if (await fs.stat("./app/generated/schema.graphql").catch(() => false)) {
     if (process.env.NOCONFIRM) {
       console.log("schema exists, skipping generation");
       process.exit(0);
@@ -39,9 +39,9 @@ async function main() {
 
   try {
     const { schema } = await makeSchema(preset);
-    await fs.mkdir("./src/generated", { recursive: true });
+    await fs.mkdir("./app/generated", { recursive: true });
     await fs.writeFile(
-      "./src/generated/schema.graphql",
+      "./app/generated/schema.graphql",
       printSchema(lexicographicSortSchema(schema)) + "\n",
       { encoding: "utf8" },
     );

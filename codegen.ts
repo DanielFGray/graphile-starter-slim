@@ -1,10 +1,10 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "./src/generated/schema.graphql",
+  schema: "./app/generated/schema.graphql",
   documents: [
-    "./src/queries/**/*.graphql",
-    "./src/client/**/*.tsx"
+    "./app/queries/**/*.graphql",
+    // "./app/routes/**/*.tsx",
   ],
   config: {
     scalars: {
@@ -19,7 +19,7 @@ const config: CodegenConfig = {
   generates: {
     // "./src/generated/": {
     //   preset: 'client',
-    "./src/generated/index.ts": {
+    "./app/generated/index.ts": {
       plugins: [
         {
           add: {
@@ -30,8 +30,8 @@ const config: CodegenConfig = {
         },
         "typescript",
         "typescript-operations",
-        "typescript-react-apollo",
-        // "typed-document-node",
+        // "typescript-react-apollo",
+        "typed-document-node",
       ],
       config: {
         immutableTypes: true,
@@ -48,7 +48,7 @@ const config: CodegenConfig = {
     },
   },
   hooks: {
-    afterOneFileWrite: ["prettier --write './src/generated/index.ts'"],
+    afterOneFileWrite: ["prettier --write './app/generated/index.ts'"],
   },
 };
 export default config;

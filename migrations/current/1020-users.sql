@@ -134,3 +134,16 @@ create trigger _500_gql_update
     'graphql:user:$1', -- the "topic" the event will be published to, as a template
     'id' -- If specified, `$1` above will be replaced with NEW.id or OLD.id from the trigger.
   );
+
+create function app_private.tg_first_user_is_admin() returns trigger as $$
+begin
+  update app_public.users set role = 'admin' where id = new.id;
+  drop trigger _600_first_admin on app_public.users;
+  return new;
+end;
+$$ language plpgsql volatile set search_path to pg_catalog, public, pg_temp;
+
+create trigger _600_first_admin
+  after insert on app_public.users
+  for each row
+  execute procedure app_private.tg_first_user_is_admin();

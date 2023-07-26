@@ -1,0 +1,23 @@
+query ProfileSettings {
+  ...SharedLayout_Query
+  currentUser {
+    id
+    isVerified
+    hasPassword
+    userEmails(first: 50) {
+      nodes {
+        id
+        email
+        isVerified
+        isPrimary
+        createdAt
+      }
+    }
+    authentications: userAuthenticationsList(first: 50) {
+      id
+      service
+      identifier
+      createdAt
+    }
+  }
+}

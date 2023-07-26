@@ -22,7 +22,6 @@ async function main() {
   let attempts = 0;
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    console.log("waiting on db...");
     try {
       await pgPool.query('select true as "Connection test"');
       break;

@@ -1,0 +1,15 @@
+fragment PostFields on Post {
+  id
+  user {
+    username
+  }
+  title
+  body
+  tags
+  score
+  comments {
+    totalCount
+  }
+  createdAt
+  updatedAt
+}

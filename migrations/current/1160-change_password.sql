@@ -4,7 +4,7 @@
  * the user type it twice, but that isn't necessary in the API.
  */
 
-create function app_public.change_password(new_password text, old_password text default null) returns boolean as $$
+create function app_public.change_password(old_password text, new_password text) returns boolean as $$
 declare
   v_user app_public.users;
   v_user_secret app_private.user_secrets;
@@ -16,12 +16,11 @@ begin
   if v_user is null then
     raise exception 'You must log in to change your password' using errcode = 'LOGIN';
   end if;
-
   -- Load their secrets
   select * into v_user_secret from app_private.user_secrets
   where user_secrets.user_id = v_user.id;
 
-  if v_user_secret.password_hash != null and v_user_secret.password_hash != crypt(old_password, v_user_secret.password_hash) then
+  if v_user_secret.password_hash != crypt(old_password, v_user_secret.password_hash) then
     raise exception 'Incorrect password' using errcode = 'CREDS';
   end if;
 
@@ -38,7 +37,7 @@ begin
   where sessions.user_id = v_user.id
   and sessions.uuid <> app_public.current_session_id();
 
-  -- Notify user their password was changed=================
+  -- Notify user their password was changed
   perform graphile_worker.add_job(
     'user__audit',
     json_build_object(
@@ -46,6 +45,7 @@ begin
       'user_id', v_user.id,
       'current_user_id', app_public.current_user_id()
     ));
+
   return true;
 end;
 $$ language plpgsql strict volatile security definer set search_path to pg_catalog, public, pg_temp;

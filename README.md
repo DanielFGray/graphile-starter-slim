@@ -1,32 +1,51 @@
-# graphile-starter-slim
+# Welcome to Remix!
 
-this is a template for starting a new graphile project with a database, graphql server, and react frontend
+- [Remix Docs](https://remix.run/docs)
 
-## getting started
+## Development
 
-### requirements
+Start the Remix development asset server and the Express server by running:
 
-* node (v18+)
-* yarn
-* docker
-* docker-compose
-
-once you have the required software and have cloned the repo, from inside the repo directory:
-
-``` sh
-yarn setup
+```sh
+npm run dev
 ```
 
-the `setup` script will run several commands:
+This starts your app in development mode, which will purge the server require cache when Remix rebuilds assets so you don't need a process manager restarting the express server.
 
-* install package dependencies
-* generate an .env file
-* start building a custom docker postgres image with extensions
-* create databases and roles
-* run database migrations
-* use `postgraphile` to generate a graphql schema from the postgres schema
-* `start` the dev server, which will:
-  * look for graphql queries and generate typescript commands using `graphql-codegen`
-  * watch for migration files to change and keep the db in sync using `graphile-migrate`
-  * generate css classes (using `tailwind`)
-  * start the dev server running `postgraphile` and server-rendering react using `vite`
+## Deployment
+
+First, build your app for production:
+
+```sh
+npm run build
+```
+
+Then run the app in production mode:
+
+```sh
+npm start
+```
+
+Now you'll need to pick a host to deploy it to.
+
+### DIY
+
+If you're familiar with deploying express applications you should be right at home just make sure to deploy the output of `remix build`
+
+- `build/`
+- `public/build/`
+
+### Using a Template
+
+When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
+
+```sh
+cd ..
+# create a new project, and pick a pre-configured host
+npx create-remix@latest
+cd my-new-remix-app
+# remove the new project's app (not the old one!)
+rm -rf app
+# copy your app over
+cp -R ../my-old-remix-app/app app
+```
