@@ -3,5 +3,7 @@ node_modules/
 src/generated/
 .env
 .eslintcache
-dist
-.swc
+.swc/
+build/
+public/build
+.cache
