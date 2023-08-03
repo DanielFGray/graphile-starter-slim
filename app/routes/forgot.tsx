@@ -21,7 +21,7 @@ export default function ForgotPassword() {
           email address correctly, and check in your spam folder just in case.
         </Card>
       ) : (
-        <Form method="post" className="mx-auto md:max-w-4xl p-4">
+        <Form method="post" className="mx-auto p-4 md:max-w-4xl">
           <Card as="fieldset">
             <Legend>forgot password</Legend>
             <Container>

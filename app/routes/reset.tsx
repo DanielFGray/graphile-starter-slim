@@ -21,7 +21,7 @@ export default function ResetPage() {
     <Layout forbidWhen={auth => auth.NEVER}>
       <div className="mx-auto max-w-4xl">
         {actionData && "message" in actionData ? (
-          <Card className="bg-red-100 mb-4">
+          <Card className="mb-4 bg-red-100">
             <FormErrors errors={actionData.message} />
           </Card>
         ) : null}

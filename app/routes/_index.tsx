@@ -20,7 +20,7 @@ export default function Index() {
   return (
     <Layout>
       {data?.currentUser && showForm ? (
-        <Form method="post" className="max-w-2xl mx-auto">
+        <Form method="post" className="mx-auto max-w-2xl">
           <Card as="fieldset">
             <Legend>new post</Legend>
             <Container>
@@ -48,7 +48,7 @@ export default function Index() {
           </Button>
         </div>
       ) : null}
-      <div className="flex flex-row flex-wrap gap-4 shrink-0">
+      <div className="flex shrink-0 flex-row flex-wrap gap-4 p-4">
         {data?.posts?.nodes.map(post => (
           <Post key={post.id} {...post} />
         ))}

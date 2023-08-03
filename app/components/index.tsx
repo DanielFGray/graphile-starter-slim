@@ -17,10 +17,7 @@ export function Card<T>({
 } & React.ComponentPropsWithoutRef<T>) {
   return (
     <As
-      className={clsx(
-        "bg-gray-100 dark:bg-gray-700 p-4 shadow-md dark:text-primary-50",
-        className,
-      )}
+      className={clsx("bg-gray-100 p-4 shadow-md dark:bg-gray-700 dark:text-primary-50", className)}
       {...props}
     >
       {children}
@@ -72,21 +69,24 @@ export function Button({
     <button
       {...props}
       className={clsx(
-          variant === "primary" ? "bg-primary-600 text-primary-100 hover:bg-primary-500"
-        : variant === "danger" ? "bg-red-100 text-red-900 border border-red-300 hover:bg-red-200"
-        : "bg-primary-200 text-primary-900 hover:bg-primary-100",
+        variant === "primary"
+          ? "bg-primary-600 text-primary-100 hover:bg-primary-500"
+          : variant === "danger"
+          ? "bg-red-100 text-red-900 hover:bg-red-200"
+          : "bg-primary-200 text-primary-900 hover:bg-primary-100",
         `
+          rounded
           border-0
+          p-2
+          font-semibold
+          shadow-sm
+          transition-all
+          hover:-translate-y-px
+          hover:shadow-lg
+          focus:translate-x-0
           focus:outline-primary-700
           focus:ring-1
           focus:ring-primary-700
-          focus:translate-x-0
-          font-semibold
-          hover:-translate-y-px
-          hover:shadow-lg
-          p-2
-          rounded
-          shadow-sm
         `.replace(/\s+/g, " "),
         className,
       )}
@@ -104,27 +104,29 @@ export function Input({
   | ({
       type: "textarea";
     } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)) {
-  const commonClasses = `
-    bg-primary-50
+  const commonClasses = clsx(
+    `
+    w-full
+    rounded
     border-0
-    dark:bg-primary-600
-    dark:placeholder:text-primary-400
-    dark:text-primary-100
-    focus:ring-2
-    focus:ring-inset
-    focus:ring-primary-400
-    focus:shadow-none
+    bg-primary-50
+    text-sm
+    shadow-md
     outline
     outline-1
     outline-primary-300
     hover:outline-primary-400
+    focus:shadow-none
+    focus:ring-2
+    focus:ring-inset
+    focus:ring-primary-400
+    dark:bg-primary-600
+    dark:text-primary-100
     dark:outline-primary-500
+    dark:placeholder:text-primary-400
     dark:hover:outline-primary-400
-    rounded
-    shadow-md
-    text-sm
-    w-full
-  `.replace(/\s+/g, " ");
+  `.replace(/\s+/g, " "),
+  );
   return props.type ===
     "textarea" /* @ts-expect-error polymorphism is a pain to type properly */ ? (
     <textarea {...props} className={clsx("form-textarea", commonClasses, className)}>
@@ -144,6 +146,7 @@ export function Legend<T>({
   as?: ElementType<T>;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>) {
   return (
+    /* @ts-expect-error polymorphism is a pain to type properly */
     <As
       className={clsx(
         "p-2 -rotate-1 -skew-y-1 shadow-md italic font-medium",
@@ -307,7 +310,7 @@ export function SocialLogin({
   redirectTo?: string;
   label: string | ((service: string) => string);
 }) {
-  if (SocialLoginServices.length < 1) return null
+  if (SocialLoginServices.length < 1) return null;
   return (
     <div className="text-center">
       {SocialLoginServices.map(service => (

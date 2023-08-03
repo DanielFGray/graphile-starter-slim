@@ -50,7 +50,7 @@ export async function installPassport(app: Express) {
           username: profile.username,
           avatarUrl: profile?.photos?.[0]?.value,
           email: profile.email || profile?.emails?.[0]?.value,
-        }
+        };
       },
     });
   }

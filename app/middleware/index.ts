@@ -31,11 +31,10 @@ export const loaders =
   };
 
 export const fromGraphQL: Middleware<Parameters<GraphQLExecutor>> =
-  (document, variables) =>
-  async ctx => {
-    console.log('fetching:', document.loc.source.body)
+  (document, variables) => async ctx => {
+    console.log("fetching:", document.loc.source.body);
     const response = await ctx.context.graphql(document, variables);
-    console.log(response)
+    console.log(response);
     if (response.errors) {
       if (response.errors[1]) throw Error(response.errors);
       throw response.errors[0];
@@ -53,8 +52,7 @@ enum AuthRestrict {
 }
 
 export const forbidWhen: Middleware =
-  (when: (auth: typeof AuthRestrict) => AuthRestrict) =>
-  async (ctx, next) => {
+  (when: (auth: typeof AuthRestrict) => AuthRestrict) => async (ctx, next) => {
     const forbidWhen = when(AuthRestrict);
     const forbidsLoggedOut = forbidWhen & AuthRestrict.LOGGED_OUT;
     const forbidsLoggedIn = forbidWhen & AuthRestrict.LOGGED_IN;

@@ -42,10 +42,10 @@ export function extractError(
 
 export function getExceptionFromError(error: null | Error | ApolloError | GraphQLError):
   | (Error & {
-    code?: string;
-    fields?: string[];
-    extensions?: { code?: string; fields?: string[] };
-  })
+      code?: string;
+      fields?: string[];
+      extensions?: { code?: string; fields?: string[] };
+    })
   | null {
   // @ts-ignore
   const graphqlError: GraphQLError = extractError(error);

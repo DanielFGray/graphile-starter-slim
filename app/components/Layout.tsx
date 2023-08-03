@@ -8,7 +8,7 @@ import { ErrorBoundary as DefaultErrorBoundary } from "react-error-boundary";
 const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
   return clsx(
     route.isActive ? "font-bold decoration-primary-200" : "decoration-primary-400",
-    "underline hover:decoration-primary-200 decoration-thick decoration-2",
+    "decoration-thick underline decoration-2 hover:decoration-primary-200",
   );
 };
 
@@ -17,7 +17,7 @@ function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] })
   const navigate = useNavigate();
   return (
     <header>
-      <nav className="border-b border-primary-500 text-primary-100 bg-primary-800 border-primary-540 mb-4 tracking-tight">
+      <nav className="border-primary-540 mb-4 border-b border-primary-500 bg-primary-800 tracking-tight text-primary-100">
         <ul className="flex flex-row justify-between gap-4 p-4">
           <div>
             <li>

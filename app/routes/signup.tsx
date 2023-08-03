@@ -27,7 +27,7 @@ export default function SignUp() {
       <Form method="post" className="mx-auto max-w-4xl">
         <Card as="fieldset">
           <Legend>sign up</Legend>
-          <div className="pb-4 border-b border-primary-300">
+          <div className="border-b border-primary-300 pb-4">
             <SocialLogin label="sign up" />
           </div>
           <Container className="mt-4">
@@ -93,5 +93,5 @@ export const action = async ({ request, context: { graphql } }: ActionArgs) => {
   const response = await graphql(RegisterDocument, formdata);
   console.log(response);
   if (!response.data?.register?.user.id) return json(response);
-  throw redirect(params.redirectTo || '/')
+  throw redirect(params.redirectTo || "/");
 };

@@ -27,7 +27,7 @@ export default function Login() {
       <Form method="post" className="mx-auto max-w-4xl">
         <Card as="fieldset">
           <Legend>log in</Legend>
-          <div className="pb-4 border-b border-primary-300">
+          <div className="border-b border-primary-300 pb-4">
             <SocialLogin label="log in" redirectTo={redirectTo} />
           </div>
           <Container className="mt-4">

@@ -6,7 +6,7 @@ import { useLoaderData } from "@remix-run/react";
 export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams);
   const result = await graphql(VerifyEmailDocument, searchParams);
-  console.log(result)
+  console.log(result);
   return json({
     ...result.data?.verifyEmail?.query,
     message: result.data?.verifyEmail?.success
@@ -21,7 +21,7 @@ export default function Verify() {
   return (
     <Layout>
       <Card className="m-4">
-        <Container className="p-4 items-center">{message}</Container>
+        <Container className="items-center p-4">{message}</Container>
       </Card>
     </Layout>
   );

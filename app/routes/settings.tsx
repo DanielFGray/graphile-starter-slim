@@ -25,7 +25,7 @@ export async function loader({ context: { graphql } }: LoaderArgs) {
 export default function SettingsPage() {
   return (
     <Layout>
-      <Container className="max-w-4xl mx-auto mb-4">
+      <Container className="mx-auto mb-4 max-w-4xl">
         <UserProfile />
         <PasswordSettings />
         <EmailSettings />

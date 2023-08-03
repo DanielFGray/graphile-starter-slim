@@ -15,10 +15,10 @@ export function Post(post: PostFieldsFragment) {
           ))}
         </div>
       )}
-      <ul className="flex flex-row gap-2 items-baseline">
-        <span className="text-primary-100 bg-primary-700 p-1">by {post.user?.username}</span>
+      <ul className="flex flex-row items-baseline gap-2">
+        <span className="bg-primary-700 p-1 text-primary-100">by {post.user?.username}</span>
         {post.tags.map(t => (
-          <li key={t} className="text-primary-100 bg-primary-700 p-1">
+          <li key={t} className="bg-primary-700 p-1 text-primary-100">
             #{t}
           </li>
         ))}
