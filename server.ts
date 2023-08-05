@@ -1,19 +1,23 @@
-import type { GetLoadContextFunction } from "@remix-run/express";
-import path from "path";
-import { createRequestHandler } from "@remix-run/express";
-import { installGlobals } from "@remix-run/node";
-import { execute, hookArgs } from "grafast";
+import fs from "node:fs/promises";
+import { type GetLoadContextFunction, createRequestHandler } from "@remix-run/express";
+import { broadcastDevReady, installGlobals } from "@remix-run/node";
 import express from "express";
 import morgan from "morgan";
 import postgraphile from "postgraphile";
-import { getPreset } from "./server/graphile.config.ts";
+import { execute, hookArgs } from "grafast";
 import { Pool } from "pg";
-import { makeApp } from "./server/app";
+import chokidar from "chokidar";
+import sourceMapSupport from "source-map-support";
+import { getPreset } from "./server/graphile.config.ts";
+import { makeApp } from "./server/app.ts";
 
+sourceMapSupport.install();
 installGlobals();
 
 const mode = process.env.NODE_ENV;
-const BUILD_DIR = path.join(process.cwd(), "build");
+const BUILD_PATH = "./build/index.js";
+/** @type { import('@remix-run/node').ServerBuild | Promise<import('@remix-run/node').ServerBuild> } */
+let build = import(BUILD_PATH);
 
 const app = express();
 
@@ -29,65 +33,66 @@ app.use(express.static("public", { maxAge: "3h" }));
 
 app.use(morgan(mode === "production" ? "common" : "dev"));
 
-const rootPgPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-// This pool runs as the unprivileged user, it's what PostGraphile uses.
-const authPgPool = new Pool({ connectionString: process.env.AUTH_DATABASE_URL });
-
-const pgl = postgraphile(getPreset({ authPgPool, rootPgPool }));
-
-const getLoadContext: GetLoadContextFunction = (req, res) => ({
-  async graphql(document, variableValues) {
-    const schema = await pgl.getSchema();
-    const args = {
-      schema,
-      document,
-      variableValues,
-    };
-    await hookArgs(args, pgl.getResolvedPreset(), {
-      node: { req, res },
-      expressv4: { req, res },
-    });
-    return await execute(args);
-  },
-});
-
 makeApp({ app }).then(app => {
-  if (mode === "production") {
-    app.all(
-      "*",
-      createRequestHandler({
-        build: require(BUILD_DIR),
-        mode,
-        getLoadContext,
-      }),
-    );
-  } else {
-    app.all("*", (req, res, next) => {
-      purgeRequireCache();
-      return createRequestHandler({
-        build: require(BUILD_DIR),
-        mode,
-        getLoadContext,
-      })(req, res, next);
-    });
-  }
+  const pgl = app.get("pgl");
+  const getLoadContext: GetLoadContextFunction = (req, res) => ({
+    async graphql(document, variableValues) {
+      const schema = await pgl.getSchema();
+      const args = {
+        schema,
+        document,
+        variableValues,
+      };
+      await hookArgs(args, pgl.getResolvedPreset(), {
+        node: { req, res },
+        expressv4: { req, res },
+      });
+      return await execute(args);
+    },
+  });
+
+  app.all(
+    "*",
+    mode === "development"
+      ? createDevRequestHandler()
+      : createRequestHandler({
+          build,
+          getLoadContext,
+          mode,
+        }),
+  );
+
   const port = process.env.PORT || 3000;
 
-  app.listen(port, () => {
+  app.listen(port, async () => {
     console.log(`Express server listening on port ${port}`);
-  });
-});
 
-function purgeRequireCache() {
-  // purge require cache on requests for "server side HMR" this won't let
-  // you have in-memory objects between requests in development,
-  // alternatively you can set up nodemon/pm2-dev to restart the server on
-  // file changes, but then you'll have to reconnect to databases/etc on each
-  // change. We prefer the DX of this, so we've included it for you by default
-  for (const key in require.cache) {
-    if (key.startsWith(BUILD_DIR)) {
-      delete require.cache[key];
+    if (mode !== "production") {
+      broadcastDevReady(await build);
     }
+  });
+  function createDevRequestHandler() {
+    const watcher = chokidar.watch(BUILD_PATH, { ignoreInitial: true });
+
+    watcher.on("all", async () => {
+      // 1. purge require cache && load updated server build
+      const stat = await fs.stat(BUILD_PATH);
+      build = import(BUILD_PATH + "?t=" + stat.mtimeMs);
+      // 2. tell dev server that this app server is now ready
+      broadcastDevReady(await build);
+    });
+
+    return async (req, res, next) => {
+      try {
+        //
+        return createRequestHandler({
+          build: await build,
+          getLoadContext,
+          mode,
+        })(req, res, next);
+      } catch (error) {
+        next(error);
+      }
+    };
   }
-}
+});

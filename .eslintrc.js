@@ -16,6 +16,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
     "@remix-run/eslint-config",
+    "@remix-run/eslint-config/node",
   ],
   env: {
     node: true,

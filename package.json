@@ -14,10 +14,10 @@
     "_dev:node": "tsnd -r dotenv/config -T server.ts",
     "_dev:remix": "remix watch",
     "_start": "cross-env NODE_ENV=production node ./server.js",
-    "prestart": "run-s -s db:start build:remix",
+    "prestart": "run-s -s db:start",
     "watch:tsc": "run-s -s 'typecheck --watch'",
     "watch:gqlgen": "run-s -s 'gqlgen -w'",
-    "watch:server": "tsnd -T -r dotenv/config ./server.ts",
+    "watch:server": "remix dev --manual -c \"tsnd -T -r dotenv/config ./server.ts\"",
     "watch:remix": "remix watch",
     "watch:db": "run-s -s 'gm watch'",
     "start": "run-p -s watch:db watch:gqlgen watch:remix watch:server #watch:tsc",
@@ -84,6 +84,7 @@
     "react-error-boundary": "^4.0.10",
     "redis": "^4.6.7",
     "s-ago": "^2.2.0",
+    "source-map-support": "^0.5.21",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
