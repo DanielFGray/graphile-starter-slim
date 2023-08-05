@@ -3,7 +3,6 @@ import { type PostFieldsFragment } from "~/generated";
 import ago from "s-ago";
 
 export function Post(post: PostFieldsFragment) {
-  if (!post) return null;
   const createdAt = new Date(post.createdAt);
   return (
     <Card>
@@ -22,7 +21,7 @@ export function Post(post: PostFieldsFragment) {
             #{t}
           </li>
         ))}
-        <span className="bg-gray-50">{ago(createdAt)}</span>
+        <time dateTime={createdAt.toLocaleString()}>{ago(createdAt)}</time>
       </ul>
     </Card>
   );

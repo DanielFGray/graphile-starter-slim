@@ -1,6 +1,6 @@
 import { Container, Card, Layout } from "~/components";
 import { VerifyEmailDocument } from "~/generated";
-import { LoaderArgs, json } from "@remix-run/node";
+import { type LoaderArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, context: { graphql } }: LoaderArgs) {

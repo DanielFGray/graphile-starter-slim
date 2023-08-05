@@ -1,10 +1,10 @@
-import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "postgraphile/adaptors/pg";
 // TODO: import GraphilePro from "@graphile/pro"; // Requires license key
 import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
 import { Request } from "express";
-import type {} from "grafserv/express/v4";
-import { NodePlugin } from "graphile-build";
-import { makePgSmartTagsFromFilePlugin } from "graphile-utils";
+import type {} from "postgraphile/grafserv/express/v4";
+import { NodePlugin } from "postgraphile/graphile-build";
+import { makePgSmartTagsFromFilePlugin } from "postgraphile/utils";
 import path from "node:path";
 import { Pool } from "pg";
 import postgraphilePresetAmber from "postgraphile/presets/amber";
@@ -175,7 +175,7 @@ export function getPreset({ authPgPool, rootPgPool }: IPostGraphileOptionsOption
           SubscriptionsPlugin,
 
           // Adds custom orders to our GraphQL schema
-          OrdersPlugin,
+          // OrdersPlugin,
         ],
 
         /*

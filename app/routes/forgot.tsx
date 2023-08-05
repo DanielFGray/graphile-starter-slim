@@ -1,5 +1,5 @@
 import { Button, Container, Card, FormRow, Input, Layout, Legend, FormErrors } from "~/components";
-import { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { type ActionArgs, type LoaderArgs } from "@remix-run/node";
 import { ForgotPasswordDocument, SharedLayoutDocument } from "~/generated";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 

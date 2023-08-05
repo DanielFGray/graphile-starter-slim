@@ -13,7 +13,7 @@ module.exports = {
     },
   },
   plugins: [
-    require('@danielfgray/tw-heropatterns'),
+    // require('@danielfgray/tw-heropatterns'),
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),

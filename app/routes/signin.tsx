@@ -1,5 +1,4 @@
-import React, { startTransition } from "react";
-import { Form, Link, useNavigate, useSearchParams } from "@remix-run/react";
+import { Form, Link, useSearchParams } from "@remix-run/react";
 import { SharedLayoutDocument, LoginDocument } from "../generated";
 import {
   Layout,
@@ -12,7 +11,7 @@ import {
   Legend,
   SocialLogin,
 } from "../components";
-import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
+import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/node";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);

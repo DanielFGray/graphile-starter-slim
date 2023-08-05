@@ -87,7 +87,9 @@ export function Button({
           focus:outline-primary-700
           focus:ring-1
           focus:ring-primary-700
-        `.replace(/\s+/g, " "),
+        `
+          .trim()
+          .replace(/\s+/g, " "),
         className,
       )}
     >
@@ -149,11 +151,9 @@ export function Legend<T>({
     /* @ts-expect-error polymorphism is a pain to type properly */
     <As
       className={clsx(
-        "p-2 -rotate-1 -skew-y-1 shadow-md italic font-medium",
-        // !/\btext-/.test(className) &&
-        "text-primary-800",
-        // !/\bbg-/.test(className) &&
-        "bg-primary-100",
+        "-rotate-1 -skew-y-1 p-2 font-medium italic shadow-md",
+        !/\btext-/.test(className) && "text-primary-800",
+        !/\bbg-/.test(className) && "bg-primary-100",
         className,
       )}
       {...props}
@@ -163,88 +163,19 @@ export function Legend<T>({
   );
 }
 
-const formCtx = React.createContext<
-  | {
-      setErrors(a: Array<string> | null): void;
-      errors: Array<string> | null | undefined;
-    }
-  | undefined
->(undefined);
-
-export function Form({
-  children,
-  onSubmit,
-  ...props
-}: {
-  children: React.ReactNode | ((props: { errors: Array<string> | null }) => React.ReactNode);
-  onSubmit: (args: {
-    event: React.FormEvent<HTMLFormElement>;
-    setErrors: (err: Error | null | string | Array<string>) => void;
-    values: Record<string, any>;
-  }) => Promise<void> | void;
-} & Omit<React.FormHTMLAttributes<HTMLFormElement>, "onSubmit" | "children">) {
-  const [errors, _setErrors] = useState<null | Array<string>>();
-  const setErrors = useCallback((str: Error | null | string | Array<string>) => {
-    _setErrors(s => {
-      if (str == null) return null;
-      return (s || []).concat(str instanceof Error ? str.message : str);
-    });
-  }, []);
-
-  return (
-    <formCtx.Provider value={{ setErrors, errors }}>
-      <form
-        {...props}
-        onSubmit={async event => {
-          event.preventDefault();
-          setErrors(null);
-          const values = Object.fromEntries(new FormData(event.currentTarget));
-          try {
-            await onSubmit({ event, values, setErrors });
-          } catch (err) {
-            const code = getCodeFromError(err);
-            switch (code) {
-              case "CREDS":
-                setErrors("Incorrect username or password");
-                break;
-              case "MODAT":
-                setErrors("Email is required");
-                break;
-              case "WEAKP":
-                setErrors("Password is too weak or too common, please make it stronger");
-                break;
-              case "EMTKN":
-                setErrors(
-                  "An account with this email address has already been registered, consider using the 'Forgot passphrase' function.",
-                );
-                break;
-              case "NUNIQ":
-                setErrors(
-                  "An account with this username has already been registered, please try a different username.",
-                );
-                break;
-              default:
-                throw extractError(err);
-            }
-          }
-        }}
-      >
-        {typeof children === "function" ? children({ errors }) : children}
-      </form>
-    </formCtx.Provider>
-  );
-}
-
 export function FormErrors(props: { errors?: null | string | Error | Array<string | Error> }) {
   if (!props.errors) return null;
   const errs = ensureArray(props.errors);
   return (
     <Container>
-      {errs.map(err => (
-        <Danger as="div" key={err}>
-          {typeof err === "string" ? err : err.message}
-        </Danger>
-      ))}
+      {errs.map(err => {
+        const msg = typeof err === "string" ? err : err.message;
+        return (
+          <Danger as="div" key={msg}>
+            {msg}
+          </Danger>
+        );
+      })}
     </Container>
   );
 }
@@ -253,16 +184,18 @@ export function FormRow({
   label,
   children,
   className,
+  as: As = "label",
 }: {
   label?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-}) {
+  as?: ElementType<T>;
+} & React.ComponentPropsWithoutRef<T>) {
   return (
-    <label className={clsx("flex flex-col sm:flex-row sm:items-center", className)}>
+    <As className={clsx("flex flex-col sm:flex-row sm:items-center", className)}>
       {label && <span className="sm:w-5/12">{label}</span>}
       <span className={clsx(label && "sm:w-7/12")}>{children}</span>
-    </label>
+    </As>
   );
 }
 

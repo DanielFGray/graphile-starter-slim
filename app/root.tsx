@@ -1,14 +1,16 @@
-// import { cssBundleHref } from "@remix-run/css-bundle";
+import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import tailwindcss from "~/tailwind.css";
 import {
+  type V2_MetaFunction,
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  V2_MetaFunction,
+  isRouteErrorResponse,
+  useRouteError,
 } from "@remix-run/react";
 import rdtStylesheet from "remix-development-tools/stylesheet.css";
 import { RemixDevTools } from "remix-development-tools";
@@ -20,7 +22,7 @@ export const meta: V2_MetaFunction = () => [
 ];
 export const links: LinksFunction = () => {
   return [
-    // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+    ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
     ...(rdtStylesheet ? [{ rel: "stylesheet", href: rdtStylesheet }] : []),
     { rel: "stylesheet", href: tailwindcss },
   ];
@@ -84,20 +86,27 @@ export default function App() {
   );
 }
 
-export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
-  console.error({ error });
-  return (
-    <html lang="en">
-      <head>
-        <title>Oh no!</title>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Scripts />
-        an error occurred 🙁
-        {error?.message || error?.toString()}
-      </body>
-    </html>
-  );
-};
+export function ErrorBoundary(props: unknown) {
+  const error = useRouteError();
+  console.error(error, props);
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div>
+        <h1>
+          {error.status} {error.statusText}
+        </h1>
+        <p>{error.data}</p>
+      </div>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+        <p>The stack trace is:</p>
+        <pre>{error.stack}</pre>
+      </div>
+    );
+  }
+  return <h1>Unknown Error</h1>;
+}

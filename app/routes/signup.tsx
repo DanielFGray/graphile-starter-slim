@@ -10,20 +10,19 @@ import {
   Danger,
   SocialLogin,
 } from "~/components";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { RegisterDocument, SharedLayoutDocument } from "~/generated";
-import { loaders, forbidWhen, fromGraphQL } from "~/middleware";
-import { ActionArgs, json, redirect } from "@remix-run/node";
+import { type LoaderArgs, type ActionArgs, json, redirect } from "@remix-run/node";
 
-export const loader = loaders(
-  fromGraphQL(SharedLayoutDocument, {}),
-  forbidWhen(auth => auth.LOGGED_IN),
-);
+export async function loader({ context: { graphql } }: LoaderArgs) {
+  const { data } = await graphql(SharedLayoutDocument);
+  return json(data);
+}
+
 
 export default function SignUp() {
-  const data = useLoaderData<typeof loader>();
   return (
-    <Layout user={data?.currentUser}>
+    <Layout forbidWhen={auth => auth.LOGGED_IN}>
       <Form method="post" className="mx-auto max-w-4xl">
         <Card as="fieldset">
           <Legend>sign up</Legend>

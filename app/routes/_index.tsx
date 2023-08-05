@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { json, type ActionArgs, type LoaderArgs } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import { Layout, Card, Legend, Container, Input, FormErrors, Button } from "~/components";
 import { CreatePostDocument, LatestPostsDocument } from "~/generated";
 import { Post } from "./post";
-import { fromGraphQL } from "~/middleware";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(LatestPostsDocument);
@@ -12,22 +11,21 @@ export async function loader({ context: { graphql } }: LoaderArgs) {
 }
 
 export default function Index() {
-  const [showForm, setShowForm] = useState(false);
+  const [params] = useSearchParams();
+  const [showForm, setShowForm] = useState<boolean>(Boolean(params.get("showForm") ?? false));
   const data = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
-  console.log(navigation);
   return (
     <Layout>
       {data?.currentUser && showForm ? (
-        <Form method="post" className="mx-auto max-w-2xl">
+        <Form method="post" className="mx-auto max-w-2xl" onReset={() => setShowForm(false)}>
           <Card as="fieldset">
             <Legend>new post</Legend>
             <Container>
               <Input placeholder="title" type="text" name="title" required />
               <Input placeholder="body" type="textarea" name="body" required />
               <div className="flex flex-row gap-4 [&>*]:grow">
-                <Button variant="primary" type="submit">
+                <Button variant="primary" disabled={navigation.state !== "idle"} type="submit">
                   send
                 </Button>
                 <Button type="reset">cancel</Button>
@@ -37,16 +35,17 @@ export default function Index() {
           </Card>
         </Form>
       ) : data?.currentUser ? (
-        <div className="text-center">
-          <Button
-            variant="primary"
-            className="text-2xl font-bold px-4"
-            disabled={navigation.state !== "idle"}
-            onClick={() => setShowForm(true)}
-          >
+        <form
+          className="text-center"
+          onSubmit={ev => {
+            ev.preventDefault();
+            setShowForm(true);
+          }}
+        >
+          <Button variant="primary" className="px-4 text-2xl font-bold" name="showForm" value="1">
             create post
           </Button>
-        </div>
+        </form>
       ) : null}
       <div className="flex shrink-0 flex-row flex-wrap gap-4 p-4">
         {data?.posts?.nodes.map(post => (

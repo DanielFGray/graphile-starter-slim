@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { LoaderArgs, ActionArgs, json } from "@remix-run/node";
+import { useState } from "react";
+import { type LoaderArgs, type ActionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import { Button, Card, Container, FormErrors, FormRow, Input, Layout, Legend } from "~/components";
 import { ResetPasswordDocument, SharedLayoutDocument } from "~/generated";

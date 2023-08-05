@@ -1,4 +1,4 @@
-import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "graphile-utils";
+import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "postgraphile/utils";
 import type { SQL } from "pg-sql2";
 
 /*

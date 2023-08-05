@@ -41,7 +41,7 @@
     "generate-env-file": "node scripts/generateEnvFile.mjs",
     "presetup": "yarn",
     "setup": "NOCONFIRM=1 run-s generate-env-file db:setup build:schema",
-    "fmt": "prettier --write './{src,scripts,worker}/**/*.{js,ts,tsx,mjs,graphql,css,html}'",
+    "fmt": "prettier --write './{app,server,scripts,worker}/**/*.{js,ts,tsx,mjs,graphql,css,html}'",
     "lint:js": "eslint --cache --ext=.js,.js,.ts,.tsx,.mjs src scripts worker",
     "lint": "run-p -sc lint:*",
     "lint-fix:js": "run-p -s 'lint:js --fix'",
@@ -50,9 +50,9 @@
     "typecheck": "tsc --noEmit --pretty --preserveWatchOutput"
   },
   "dependencies": {
-    "@graphile-contrib/pg-many-to-many": "^2.0.0-alpha.0",
-    "@graphile/pg-aggregates": "^0.2.0-alpha.1",
-    "@graphile/simplify-inflection": "^8.0.0-alpha.3",
+    "@graphile-contrib/pg-many-to-many": "^1.0.2",
+    "@graphile/pg-aggregates": "^0.1.1",
+    "@graphile/simplify-inflection": "^8.0.0-beta.1",
     "@remix-run/css-bundle": "^1.17.1",
     "@remix-run/express": "^1.17.1",
     "@remix-run/node": "^1.17.1",
@@ -64,12 +64,7 @@
     "csurf": "^1.11.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "grafast": "^0.0.1-alpha.9",
-    "grafserv": "^0.0.1-alpha.9",
-    "graphile-build": "^5.0.0-alpha.10",
-    "graphile-build-pg": "^5.0.0-alpha.11",
     "graphile-migrate": "^1.4.1",
-    "graphile-utils": "^5.0.0-alpha.11",
     "graphile-worker": "^0.14.0-alpha.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "helmet": "^7.0.0",
@@ -80,10 +75,10 @@
     "nodemailer": "^6.9.3",
     "passport": "^0.6.0",
     "passport-github2": "^0.1.12",
-    "pg-introspection": "^0.0.1-alpha.2",
-    "pg-sql2": "^5.0.0-alpha.3",
-    "postgraphile": "^5.0.0-alpha.11",
-    "postgraphile-plugin-connection-filter": "^3.0.0-alpha.1",
+    "pg-introspection": "^0.0.1-beta.1",
+    "pg-sql2": "^4.13.0",
+    "postgraphile": "^5.0.0-beta.2",
+    "postgraphile-plugin-connection-filter": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.10",
@@ -92,7 +87,6 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@danielfgray/tw-heropatterns": "^0.1.6",
     "@graphql-codegen/add": "^5.0.0",
     "@graphql-codegen/cli": "^4.0.1",
     "@graphql-codegen/typed-document-node": "^5.0.1",
@@ -124,6 +118,8 @@
     "nodemon": "^2.0.22",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.24",
+    "prettier": "^3.0.1",
+    "prettier-plugin-tailwindcss": "^0.4.1",
     "remix-development-tools": "^1.0.6",
     "tailwindcss": "^3.3.2",
     "ts-node-dev": "^2.0.0",
@@ -131,5 +127,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "resolutions": {
+    "graphql": "16.1.0-experimental-stream-defer.6",
+    "prettier": "^3.0.1"
   }
 }

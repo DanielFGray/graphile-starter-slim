@@ -15,6 +15,7 @@ module.exports = {
     // 'plugin:react-hooks/recommended',
     "plugin:@typescript-eslint/recommended",
     // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    "@remix-run/eslint-config",
   ],
   env: {
     node: true,

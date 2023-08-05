@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { ProfileSettingsDocument, ChangePasswordDocument, UpdateUserDocument } from "~/generated";
+import {
+  type EmailsForm_UserEmailFragment,
+  ProfileSettingsDocument,
+  ChangePasswordDocument,
+  UpdateUserDocument,
+  AddEmailDocument,
+  ResendEmailVerificationDocument,
+  MakeEmailPrimaryDocument,
+  DeleteEmailDocument,
+} from "~/generated";
 import {
   Layout,
   Card,
@@ -13,7 +22,7 @@ import {
   SocialLogin,
 } from "~/components";
 import { useLogout } from "~/lib";
-import { ActionArgs, LoaderArgs, redirect, json } from "@remix-run/node";
+import { type ActionArgs, type LoaderArgs, redirect, json } from "@remix-run/node";
 import { useSearchParams, Form, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
@@ -124,7 +133,7 @@ function EmailSettings() {
               <Email
                 key={email.id}
                 email={email}
-                hasOtherEmails={data?.currentUser?.userEmails.nodes.length > 1}
+                hasOtherEmails={Number(data?.currentUser?.userEmails.nodes.length) > 1}
               />
             ))}
           </Container>
@@ -167,28 +176,28 @@ function Email({
           Added {new Date(Date.parse(email.createdAt)).toLocaleString()}
         </div>
       </div>
-      <Form>
+      <Form method="post" className="space-x-2">
         <input type="hidden" name="emailId" value={email.id} />
-        {email.isPrimary && <span key="primary_indicator">Primary</span>}
-        {canDelete && (
-          <Button
-            type="submit"
-            name="deleteEmail"
-            onClick={() => deleteEmail({ variables: { emailId: email.id } })}
+        {email.isPrimary && (
+          <span
+            className="rounded-md bg-green-300 p-1 pb-1.5 text-sm font-bold text-green-900"
+            key="primary_indicator"
           >
+            Primary
+          </span>
+        )}
+        {canDelete && (
+          <Button variant="danger" type="submit" name="type" value="deleteEmail">
             Delete
           </Button>
         )}
         {!email.isVerified && (
-          <Button
-            variant="primary"
-            onClick={() => resendEmailVerification({ variables: { emailId: email.id } })}
-          >
+          <Button variant="primary" name="type" value="resendValidation">
             Resend verification
           </Button>
         )}
         {email.isVerified && !email.isPrimary && (
-          <Button onClick={() => makeEmailPrimary({ variables: { emailId: email.id } })}>
+          <Button name="type" value="makePrimary">
             Make primary
           </Button>
         )}
@@ -198,28 +207,31 @@ function Email({
 }
 
 function AddEmailForm() {
-  // const [addEmail] = AddEmailDocument();
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [params] = useSearchParams();
+  const [showForm, setShowForm] = useState<boolean>(Boolean(params.get("showAddEmail") ?? false));
   if (!showForm) {
     return (
-      <div>
-        <Button type="submit" onClick={() => setShowForm(true)}>
+      <form
+        onSubmit={ev => {
+          ev.preventDefault();
+          setShowForm(true);
+        }}
+      >
+        <Button type="submit" name="showAddEmail" value="1">
           Add email
         </Button>
-      </div>
+      </form>
     );
   }
   return (
-    <Form
-      onSubmit={async ({ values }) => {
-        // await addEmail({ variables: values });
-      }}
-    >
+    <Form method="post">
       <FormRow label="new email:">
         <Input type="email" name="email" required />
       </FormRow>
       <div>
-        <Button type="submit">Add email</Button>
+        <Button type="submit" name="type" value="addEmail">
+          Add email
+        </Button>
       </div>
       <FormErrors />
     </Form>
@@ -377,28 +389,38 @@ function DeleteAccount() {
 
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const { type, ...formdata } = Object.fromEntries(await request.formData());
-  console.log("changing settings:", { type, ...formdata });
-  // MakeEmailPrimaryDocument,
   // RequestAccountDeletionDocument,
-  // DeleteEmailDocument,
-  // ResendEmailVerificationDocument,
-  // UpdateUserDocument,
-  // AddEmailDocument,
   // UnlinkUserAuthenticationDocument,
   // ConfirmAccountDeletionDocument,
   try {
     switch (type) {
       case "updateProfile": {
-        console.log("updating profile");
         const { id, ...patch } = formdata;
         const result = await graphql(UpdateUserDocument, { id, patch });
-        console.log(result);
         return result;
       }
       case "changePassword": {
         const result = await graphql(ChangePasswordDocument, formdata);
-        console.log(result);
         return result;
+      }
+      case "addEmail": {
+        const result = await graphql(AddEmailDocument, formdata);
+        return result;
+      }
+      case "makePrimary": {
+        const result = await graphql(MakeEmailPrimaryDocument, formdata);
+        return result;
+      }
+      case "resendValidation": {
+        const result = await graphql(ResendEmailVerificationDocument, formdata);
+        return result;
+      }
+      case "deleteEmail": {
+        const result = await graphql(DeleteEmailDocument, formdata);
+        return result;
+      }
+      default: {
+        throw new Error(`unknown settings action type: ${type}`);
       }
     }
   } catch (e) {
