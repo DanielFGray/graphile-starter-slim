@@ -1,6 +1,8 @@
 import { GraphQLError } from "graphql";
 import { useNavigate } from "react-router-dom";
 import { startTransition } from "react";
+import { redirect } from "@remix-run/node";
+import { SharedLayout_UserFragment } from "~/generated";
 
 export async function useLogout() {
   const navigate = useNavigate();
@@ -56,4 +58,30 @@ export function getExceptionFromError(error: null | Error | ApolloError | GraphQ
 export function getCodeFromError(error: null | Error | ApolloError | GraphQLError): null | string {
   const err = getExceptionFromError(error);
   return err?.extensions?.code ?? err?.code ?? null;
+}
+
+enum AuthRestrict {
+  NEVER = 0,
+  LOGGED_OUT = 1 << 0,
+  LOGGED_IN = 1 << 1,
+  NOT_MOD = 1 << 2,
+  NOT_ADMIN = 1 << 3,
+}
+
+export function forbidWhen(
+  when: (auth: typeof AuthRestrict) => AuthRestrict,
+  currentUser: undefined | null | SharedLayout_UserFragment,
+  request: Request
+) {
+  const forbidWhen = when(AuthRestrict);
+  const forbidsLoggedOut = forbidWhen & AuthRestrict.LOGGED_OUT;
+  const forbidsLoggedIn = forbidWhen & AuthRestrict.LOGGED_IN;
+  const forbidsNotMod = forbidWhen & AuthRestrict.NOT_MOD;
+  const forbidsNotAdmin = forbidWhen & AuthRestrict.NOT_ADMIN;
+  if (currentUser && (forbidsLoggedIn || (forbidsNotAdmin && currentUser.role !== "ADMIN"))) {
+    throw redirect('/')
+  } else if (currentUser == null && forbidsLoggedOut) {
+    const location = new URL(request.url)
+    throw redirect(`/signup?redirectTo=${encodeURIComponent(location.pathname)}`);
+  }
 }

@@ -1,12 +1,11 @@
 import { Express } from "express";
 import type { HelmetOptions } from "helmet" assert { "resolution-mode": "import" };
 
-const tmpRootUrl = process.env.ROOT_URL;
+const ROOT_URL = process.env.ROOT_URL;
 
-if (!tmpRootUrl || typeof tmpRootUrl !== "string") {
+if (!ROOT_URL || typeof ROOT_URL !== "string") {
   throw new Error("Envvar ROOT_URL is required.");
 }
-const ROOT_URL = tmpRootUrl;
 
 const isDevOrTest = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 

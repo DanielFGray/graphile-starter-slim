@@ -12,17 +12,18 @@ import {
 } from "~/components";
 import { Form } from "@remix-run/react";
 import { RegisterDocument, SharedLayoutDocument } from "~/generated";
-import { type LoaderArgs, type ActionArgs, json, redirect } from "@remix-run/node";
+import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/node";
+import { forbidWhen } from "~/lib";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);
+  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request)
   return json(data);
 }
 
-
 export default function SignUp() {
   return (
-    <Layout forbidWhen={auth => auth.LOGGED_IN}>
+    <Layout>
       <Form method="post" className="mx-auto max-w-4xl">
         <Card as="fieldset">
           <Legend>sign up</Legend>
@@ -90,7 +91,6 @@ export const action = async ({ request, context: { graphql } }: ActionArgs) => {
   const formdata = Object.fromEntries(await request.formData());
   const params = Object.fromEntries(new URL(request.url).searchParams);
   const response = await graphql(RegisterDocument, formdata);
-  console.log(response);
   if (!response.data?.register?.user.id) return json(response);
   throw redirect(params.redirectTo || "/");
 };

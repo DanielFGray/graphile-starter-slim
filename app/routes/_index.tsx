@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { json, type ActionArgs, type LoaderArgs } from "@remix-run/node";
-import { Form, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
-import { Layout, Card, Legend, Container, Input, FormErrors, Button } from "~/components";
+import { json, type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
+import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { Post, Layout, Card, Legend, Container, Input, FormErrors, Button } from "~/components";
 import { CreatePostDocument, LatestPostsDocument } from "~/generated";
-import { Post } from "./post";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(LatestPostsDocument);
@@ -11,14 +9,12 @@ export async function loader({ context: { graphql } }: LoaderArgs) {
 }
 
 export default function Index() {
-  const [params] = useSearchParams();
-  const [showForm, setShowForm] = useState<boolean>(Boolean(params.get("showForm") ?? false));
   const data = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   return (
     <Layout>
-      {data?.currentUser && showForm ? (
-        <Form method="post" className="mx-auto max-w-2xl" onReset={() => setShowForm(false)}>
+      {!data?.currentUser ? null : (
+        <Form method="post" className="px-4 mx-auto max-w-3xl">
           <Card as="fieldset">
             <Legend>new post</Legend>
             <Container>
@@ -34,23 +30,9 @@ export default function Index() {
             <FormErrors />
           </Card>
         </Form>
-      ) : data?.currentUser ? (
-        <form
-          className="text-center"
-          onSubmit={ev => {
-            ev.preventDefault();
-            setShowForm(true);
-          }}
-        >
-          <Button variant="primary" className="px-4 text-2xl font-bold" name="showForm" value="1">
-            create post
-          </Button>
-        </form>
-      ) : null}
-      <div className="flex shrink-0 flex-row flex-wrap gap-4 p-4">
-        {data?.posts?.nodes.map(post => (
-          <Post key={post.id} {...post} />
-        ))}
+      )}
+      <div className="md:flex flex-row flex-wrap gap-4 p-4 space-y-4 md:space-y-0">
+        {data?.posts?.nodes.map(post => <Post key={post.id} {...post} />)}
       </div>
     </Layout>
   );
@@ -59,12 +41,7 @@ export default function Index() {
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const variables = Object.fromEntries(await request.formData());
   variables.tags = ["test"];
-  try {
-    const { data, errors } = await graphql(CreatePostDocument, variables);
-    if (errors) throw errors[0];
-    return json(data);
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  const { data, errors } = await graphql(CreatePostDocument, variables);
+  if (errors) throw errors[0];
+  return redirect(`/post/${data?.createPost?.post?.id}`);
 }

@@ -12,9 +12,11 @@ import {
   SocialLogin,
 } from "../components";
 import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/node";
+import { forbidWhen } from "~/lib";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);
+  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request)
   return json(data);
 }
 
@@ -22,7 +24,7 @@ export default function Login() {
   const [params] = useSearchParams();
   const redirectTo = params.get("redirectTo") ?? undefined;
   return (
-    <Layout forbidWhen={auth => auth.LOGGED_IN}>
+    <Layout>
       <Form method="post" className="mx-auto max-w-4xl">
         <Card as="fieldset">
           <Legend>log in</Legend>

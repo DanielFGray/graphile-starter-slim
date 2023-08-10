@@ -8,6 +8,9 @@ import {
   ResendEmailVerificationDocument,
   MakeEmailPrimaryDocument,
   DeleteEmailDocument,
+  RequestAccountDeletionDocument,
+  ConfirmAccountDeletionDocument,
+  UnlinkUserAuthenticationDocument,
 } from "~/generated";
 import {
   Layout,
@@ -21,32 +24,39 @@ import {
   Legend,
   SocialLogin,
 } from "~/components";
-import { useLogout } from "~/lib";
-import { type ActionArgs, type LoaderArgs, redirect, json } from "@remix-run/node";
-import { useSearchParams, Form, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import { forbidWhen } from "~/lib";
+import { type ActionArgs, type LoaderArgs, json } from "@remix-run/node";
+import { useSearchParams, Form, useActionData, useLoaderData } from "@remix-run/react";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(ProfileSettingsDocument, {});
-  if (data?.currentUser == null) throw redirect("/signin?redirectTo=/settings");
+  forbidWhen(auth => auth.LOGGED_OUT, data?.currentUser, request);
   return json(data);
 }
 
 export default function SettingsPage() {
+  const [params] = useSearchParams();
+  const deleteToken = params.get("delete_token");
   return (
     <Layout>
       <Container className="mx-auto mb-4 max-w-4xl">
-        <UserProfile />
-        <PasswordSettings />
-        <EmailSettings />
-        <LinkedAccounts />
-        <DeleteAccount />
+        {deleteToken ? (
+          <DeleteAccount token={deleteToken} />
+        ) : (
+          <>
+            <UserProfile />
+            <PasswordSettings />
+            <EmailSettings />
+            <LinkedAccounts />
+            <DeleteAccount />
+          </>
+        )}
       </Container>
     </Layout>
   );
 }
 
 function UserProfile() {
-  // const [updateUser, updateMutation] = UpdateUserDocument();
   const data = useLoaderData<typeof loader>();
   return (
     <Form method="POST" action="/settings">
@@ -238,45 +248,6 @@ function AddEmailForm() {
   );
 }
 
-function UnlinkAccountButton({ id }: { id: string }) {
-  // const [doUnlink, { loading: deleting }] = UnlinkUserAuthenticationDocument();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [errors, setErrors] = useState();
-
-  async function handleUnlink() {
-    setModalOpen(false);
-    try {
-      await doUnlink({ variables: { id } });
-    } catch (e) {
-      setErrors(e);
-    }
-  }
-
-  return (
-    <div>
-      {modalOpen ? (
-        <div>
-          <b>Are you sure?</b>
-          <p>
-            If you unlink this account you won&apos;t be able to log in with it any more; please
-            make sure your email is valid.
-          </p>
-          <div>
-            <Button variant="primary" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={handleUnlink}>
-              Unlink
-            </Button>
-          </div>
-        </div>
-      ) : null}
-      <Button onClick={() => setModalOpen(true)}>Unlink</Button>
-      <FormErrors errors={errors} />
-    </div>
-  );
-}
-
 function LinkedAccounts() {
   const data = useLoaderData<typeof loader>();
   return (
@@ -294,66 +265,42 @@ function LinkedAccounts() {
   );
 }
 
-function DeleteAccount() {
-  // const [requestAccountDeletion] = RequestAccountDeletionDocument();
-  // const [confirmAccountDeletion] = ConfirmAccountDeletionDocument();
-  const [errors, setErrors] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-  const [itIsDone, setItIsDone] = useState(false);
-  const [doingIt, setDoingIt] = useState(false);
-  const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const logout = useLogout();
-  const token = params.get("delete_token");
-  function doIt() {
-    setErrors(null);
-    setDoingIt(true);
-    void (async () => {
-      try {
-        const result = await requestAccountDeletion();
-        if (!result) {
-          setErrors("Result expected");
-        }
-        const { data, errors } = result;
-        if (!data || !data.requestAccountDeletion || !data.requestAccountDeletion.success) {
-          console.dir(errors);
-          setErrors("Requesting deletion failed");
-        }
-        setItIsDone(true);
-      } catch (e) {
-        setErrors(e instanceof Error ? e.message : e);
-      }
-      setDoingIt(false);
-    })();
-  }
-  function confirmDeletion() {
-    if (deleting || !token) {
-      return;
-    }
-    setErrors(null);
-    setDeleting(true);
-    void (async () => {
-      try {
-        // await confirmAccountDeletion({ variables: { token } });
-        // Display confirmation
-        setDeleted(true);
-        logout();
-      } catch (e) {
-        setErrors(e);
-      }
-      setDeleting(false);
-    })();
-  }
-  if (deleted) {
-    navigate("/");
-    return null;
-  }
+function UnlinkAccountButton({ id }: { id: string }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  return (
+    <div>
+      {modalOpen ? (
+        <Form method="post">
+          <b>Are you sure?</b>
+          <p>
+            If you unlink this account you won&apos;t be able to log in with it any more; please
+            make sure your email is valid.
+          </p>
+          <div>
+            <Button variant="primary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" name="type" value="unlinkUserAuth">
+              Unlink
+            </Button>
+          </div>
+          <input type="hidden" name="id" value={id} />
+        </Form>
+      ) : (
+        <Button onClick={() => setModalOpen(true)}>Unlink</Button>
+      )}
+    </div>
+  );
+}
+
+function DeleteAccount({ token }: { token?: string }) {
+  const actionData = useActionData();
   return (
     <Card as="fieldset">
       <Legend className="bg-red-700 text-red-100">danger zone</Legend>
       {token ? (
-        <div>
+        <Form method="post">
           <p>
             This is it. <b>Press this button and your account will be deleted.</b> We&apos;re sorry
             to see you go, please don&apos;t hesitate to reach out and let us know why you no longer
@@ -363,71 +310,79 @@ function DeleteAccount() {
             <Button
               variant="danger"
               className="font-bold"
-              onClick={confirmDeletion}
-              disabled={deleting}
+              name="type"
+              value="confirmAccountDeletion"
             >
               PERMANENTLY DELETE MY ACCOUNT
             </Button>
+            <input type="hidden" name="token" value={token} />
           </p>
-        </div>
-      ) : itIsDone ? (
+        </Form>
+      ) : actionData?.data?.requestAccountDeletion?.success ? (
         <div>
           You&apos;ve been sent an email with a confirmation link in it, you must click it to
           confirm that you are the account holder so that you may continue deleting your account.
         </div>
       ) : (
-        <p className="text-right">
-          <Button variant="danger" onClick={doIt} disabled={doingIt}>
+        <Form method="post" className="text-right">
+          <Button variant="danger" name="type" value="requestAccountDeletion">
             I want to delete my account
           </Button>
-        </p>
+        </Form>
       )}
-      <FormErrors errors={errors} />
+      <FormErrors errors={actionData?.data?.requestAccountDeletion?.errors} />
     </Card>
   );
 }
 
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const { type, ...formdata } = Object.fromEntries(await request.formData());
-  // RequestAccountDeletionDocument,
-  // UnlinkUserAuthenticationDocument,
-  // ConfirmAccountDeletionDocument,
   try {
     switch (type) {
       case "updateProfile": {
         const { id, ...patch } = formdata;
         const result = await graphql(UpdateUserDocument, { id, patch });
-        return result;
+        return json(result);
       }
       case "changePassword": {
         const result = await graphql(ChangePasswordDocument, formdata);
-        return result;
+        return json(result);
       }
       case "addEmail": {
         const result = await graphql(AddEmailDocument, formdata);
-        return result;
+        return json(result);
       }
       case "makePrimary": {
         const result = await graphql(MakeEmailPrimaryDocument, formdata);
-        return result;
+        return json(result);
       }
       case "resendValidation": {
         const result = await graphql(ResendEmailVerificationDocument, formdata);
-        return result;
+        return json(result);
       }
       case "deleteEmail": {
         const result = await graphql(DeleteEmailDocument, formdata);
-        return result;
+        return json(result);
+      }
+      case "unlinkUserAuth": {
+        const result = await graphql(UnlinkUserAuthenticationDocument, formdata)
+        return json(result)
+      }
+      case "requestAccountDeletion": {
+        const result = await graphql(RequestAccountDeletionDocument);
+        return json(result);
+      }
+      case "confirmAccountDeletion": {
+        const result = await graphql(ConfirmAccountDeletionDocument, formdata);
+        return json(result);
       }
       default: {
         throw new Error(`unknown settings action type: ${type}`);
       }
     }
   } catch (e) {
-    console.log("error changing password:", e);
-    if ("message" in e) {
-      return json({ error: e.message });
-    }
+    console.error(e);
+    if ("message" in e) return json({ errors: e.message });
   }
-  return json("unknown error");
+  return json({ errors: "unknown error" });
 }

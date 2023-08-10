@@ -39,9 +39,8 @@ const setReturnTo: RequestHandler = (req, _res, next) => {
     next();
     return;
   }
-  console.log(req.query);
-  const returnTo =
-    (req.query && req.query.redirectTo && String(req.query.redirectTo)) || req.session.returnTo;
+  const returnTo = req.query.redirectTo || req.session.returnTo;
+  console.log(returnTo);
   if (
     returnTo &&
     returnTo[0] === "/" &&

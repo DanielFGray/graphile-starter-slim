@@ -6,7 +6,7 @@ import { ResetPasswordDocument, SharedLayoutDocument } from "~/generated";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);
-  return data;
+  return json(data);
 }
 
 export default function ResetPage() {
@@ -18,7 +18,7 @@ export default function ResetPage() {
   const token = params.get("token");
 
   return (
-    <Layout forbidWhen={auth => auth.NEVER}>
+    <Layout>
       <div className="mx-auto max-w-4xl">
         {actionData && "message" in actionData ? (
           <Card className="mb-4 bg-red-100">

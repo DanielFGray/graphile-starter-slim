@@ -1,0 +1,11 @@
+fragment CommentFields on Comment {
+  id
+  body
+  currentUserVoted
+  createdAt
+  score
+  popularity
+  user {
+    username
+  }
+}

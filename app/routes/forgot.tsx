@@ -1,11 +1,13 @@
 import { Button, Container, Card, FormRow, Input, Layout, Legend, FormErrors } from "~/components";
-import { type ActionArgs, type LoaderArgs } from "@remix-run/node";
+import { json, type ActionArgs, type LoaderArgs } from "@remix-run/node";
 import { ForgotPasswordDocument, SharedLayoutDocument } from "~/generated";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { forbidWhen } from "~/lib";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);
-  return data;
+  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request)
+  return json(data);
 }
 
 export default function ForgotPassword() {
@@ -13,7 +15,7 @@ export default function ForgotPassword() {
   const navigation = useNavigation();
   if (actionData) console.log(actionData);
   return (
-    <Layout forbidWhen={auth => auth.LOGGED_IN}>
+    <Layout>
       {navigation.state !== "idle" ? (
         <Card>
           We&apos;ve sent a link to your email. Please check your email and click the link and
@@ -43,6 +45,5 @@ export async function action({ request, context: { graphql } }: ActionArgs) {
   const values = Object.fromEntries(await request.formData());
   console.log("received reset request for", values);
   const { data } = await graphql(ForgotPasswordDocument, values);
-  console.log(data);
-  return data;
+  return json(data);
 }

@@ -7,3 +7,5 @@ app/generated/
 build/
 public/build
 .cache
+.ethereal
+*error.log

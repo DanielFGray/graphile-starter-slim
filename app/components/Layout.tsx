@@ -1,8 +1,8 @@
 import React from "react";
-import { SharedLayoutQuery, SharedLayout_UserFragment } from "~/generated";
+import { SharedLayoutQuery, type SharedLayout_UserFragment } from "~/generated";
 import { Button, clsx } from "~/components";
 import { useLogout } from "../lib";
-import { NavLink, NavLinkProps, useNavigate, useLocation, useLoaderData } from "@remix-run/react";
+import { NavLink, type NavLinkProps, useNavigate, useLocation, useLoaderData } from "@remix-run/react";
 import { ErrorBoundary as DefaultErrorBoundary } from "react-error-boundary";
 
 const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
@@ -12,7 +12,7 @@ const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
   );
 };
 
-function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] }) {
+function Nav({ currentUser }: { currentUser: null | SharedLayout_UserFragment }) {
   const logout = useLogout();
   const navigate = useNavigate();
   return (
@@ -70,44 +70,15 @@ function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] })
   );
 }
 
-enum AuthRestrict {
-  NEVER = 0,
-  LOGGED_OUT = 1 << 0,
-  LOGGED_IN = 1 << 1,
-  NOT_MOD = 1 << 2,
-  NOT_ADMIN = 1 << 3,
-}
-
-export function Layout({
-  children: children,
-  forbidWhen: when = auth => auth.NEVER,
-}: {
-  children: React.ReactNode;
-  forbidWhen?: (auth: typeof AuthRestrict) => AuthRestrict;
-}) {
-  const location = useLocation();
-  const navigate = useNavigate();
+export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   if (!(data && "currentUser" in data)) throw new Error("missing user data!");
   const currentUser = data.currentUser as null | SharedLayout_UserFragment;
 
-  const forbidWhen = when(AuthRestrict);
-  const forbidsLoggedOut = forbidWhen & AuthRestrict.LOGGED_OUT;
-  const forbidsLoggedIn = forbidWhen & AuthRestrict.LOGGED_IN;
-  const forbidsNotMod = forbidWhen & AuthRestrict.NOT_MOD;
-  const forbidsNotAdmin = forbidWhen & AuthRestrict.NOT_ADMIN;
-  if (currentUser && (forbidsLoggedIn || (forbidsNotAdmin && currentUser.role !== "ADMIN"))) {
-    navigate("/", { replace: true });
-    return null;
-  } else if (currentUser == null && forbidsLoggedOut) {
-    navigate(`/signup?next=${encodeURIComponent(location.pathname)}`, { replace: true });
-    return null;
-  }
-
   return (
     <>
       <Nav currentUser={currentUser} />
-      <ErrorBoundary>{children}</ErrorBoundary>
+      <ErrorBoundary><main>{children}</main></ErrorBoundary>
     </>
   );
 }

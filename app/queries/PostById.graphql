@@ -1,0 +1,15 @@
+query PostById($id: String!) {
+  ...SharedLayout_Query
+  post(id: $id) {
+    ...PostFields
+    comments(first: 100) {
+      totalCount
+      edges {
+        cursor
+        node {
+          ...CommentFields
+        }
+      }
+    }
+  }
+}
