@@ -1,6 +1,5 @@
-import path from "path";
-import { run, makeWorkerUtils } from "graphile-worker";
-import type { WorkerUtils, Runner } from "graphile-worker";
+import path from "node:path";
+import { run, makeWorkerUtils, type WorkerUtils, type Runner } from "graphile-worker";
 import type { Express } from "express";
 import { getRootPgPool } from "./installDatabasePools";
 import { getShutdownActions } from "../app";

@@ -1,7 +1,7 @@
-import { jsonParse } from "@dataplan/json";
-import { PgClassExpressionStep } from "@dataplan/pg";
-import { access, context, lambda, listen, object, SafeError } from "grafast";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import { jsonParse } from "postgraphile/@dataplan/json";
+import { PgClassExpressionStep } from "postgraphile/@dataplan/pg";
+import { access, context, lambda, listen, SafeError } from "postgraphile/grafast";
+import { gql, makeExtendSchemaPlugin } from "postgraphile/utils";
 
 /*
  * PG NOTIFY events are sent via a channel, this function helps us determine
