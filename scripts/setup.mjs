@@ -22,15 +22,16 @@ async function main() {
   let attempts = 0;
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    console.log("waiting on db...");
     try {
       await pgPool.query('select true as "Connection test"');
       break;
     } catch (e) {
       if (e.code === "28P01") throw e;
       attempts++;
-      if (attempts >= 30) {
-        console.log("Database never came up, aborting :(");
+      if (attempts <= 30) {
+        console.log(`Database is not ready yet (attempt ${attempts}): ${e.message}`);
+      } else {
+        console.log(`Database never came up, aborting :(`);
         process.exit(1);
       }
       const delay = Math.floor(

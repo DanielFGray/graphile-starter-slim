@@ -13,5 +13,5 @@ export async function installDevWatchers(app: Express) {
   });
 
   app.set("viteDevServer", viteDevServer);
-  app.get("shutdownActions").push();
+  app.get("shutdownActions").push(() => viteDevServer.close());
 }

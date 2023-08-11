@@ -36,7 +36,7 @@
     "presetup": "yarn",
     "setup": "NOCONFIRM=1 run-s generate-env-file db:setup build:schema start",
     "fmt": "prettier --write './{src,scripts,worker}/**/*.{js,ts,tsx,mjs,graphql,css,html}'",
-    "lint:js": "eslint --cache --ext=.js,.js,.ts,.tsx,.mjs src scripts worker",
+    "lint:js": "eslint --cache --ext=.js,.ts,.tsx,.mjs src scripts worker",
     "lint": "run-p -sc lint:*",
     "lint-fix:js": "run-p -s 'lint:js --fix'",
     "lint-fix": "run-p -sc lint-fix:*",
