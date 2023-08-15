@@ -65,9 +65,7 @@ type RenderArgs = {
 const serverRoutes = Promise.all(
   routes.map(async r => {
     const Component = await r.Component();
-    const route: RouteObject = { ...r, ...Component, Component: Component.default };
-    console.log(...Object.entries(route));
-    return route;
+    return { ...r, ...Component, Component: Component.default };
   }),
 );
 

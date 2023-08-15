@@ -4,7 +4,7 @@ import { useLogoutMutation } from "../generated";
 import { useNavigate } from "react-router-dom";
 import { startTransition, useCallback } from "react";
 
-export async function useLogout() {
+export function useLogout() {
   const apolloClient = useApolloClient();
   const [handleLogout] = useLogoutMutation();
   const navigate = useNavigate();

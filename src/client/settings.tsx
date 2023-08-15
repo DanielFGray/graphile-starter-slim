@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSearchParams, Routes, Route, NavLink } from "react-router-dom";
+import { useSearchParams, Routes, Route, NavLink, useNavigate } from "react-router-dom";
 import {
   SettingsQuery,
   useChangePasswordMutation,
@@ -25,54 +25,28 @@ import {
   Container,
   Legend,
   SocialLogin,
-  Spinner,
 } from "../components";
 import { useLogout } from "../lib";
 
 export default function SettingsPage() {
+  const [params] = useSearchParams();
+  const deleteToken = params.get("delete_token");
   const query = useSettingsQuery();
-  if (!query.data) return <Spinner />;
+  if (!query.data) return null;
   return (
     <Layout query={query} title="Settings" forbidWhen={auth => auth.LOGGED_OUT}>
-      <Container className="xl:flex-row">
-        <ul className="items-middle flex flex-row justify-around gap-1 rounded bg-primary-100 p-4 dark:bg-primary-700 xl:w-1/4 xl:flex-col xl:justify-start xl:gap-4 xl:p-8">
-          <li>
-            <NavLink to="profile">profile</NavLink>
-          </li>
-          <li>
-            <NavLink to="password">password</NavLink>
-          </li>
-          <li>
-            <NavLink to="accounts">linked accounts</NavLink>
-          </li>
-          <li>
-            <NavLink to="email">emails</NavLink>
-          </li>
-          <li>
-            <NavLink to="delete">delete accounts</NavLink>
-          </li>
-        </ul>
-        <div className="max-w-4xl flex-grow">
-          <Routes>
-            <Route path="profile" element={<UserProfile data={query.data} />} />
-            <Route path="password" element={<PasswordSettings data={query.data} />} />
-            <Route path="email" element={<EmailSettings data={query.data} />} />
-            <Route path="accounts" element={<LinkedAccounts data={query.data} />} />
-            <Route path="delete" element={<DeleteAccount />} />
-            <Route
-              index
-              element={
-                <>
-                  <UserProfile data={query.data} />
-                  <PasswordSettings data={query.data} />
-                  <EmailSettings data={query.data} />
-                  <LinkedAccounts data={query.data} />
-                  <DeleteAccount />
-                </>
-              }
-            />
-          </Routes>
-        </div>
+      <Container className="mx-auto mb-4 max-w-4xl">
+        {deleteToken ? (
+          <DeleteAccount token={deleteToken} />
+        ) : (
+          <>
+            <UserProfile data={query.data} />
+            <PasswordSettings data={query.data} />
+            <EmailSettings data={query.data} />
+            <LinkedAccounts data={query.data} />
+            <DeleteAccount />
+          </>
+        )}
       </Container>
     </Layout>
   );
@@ -85,7 +59,7 @@ function UserProfile({ data }: { data: SettingsQuery }) {
       onSubmit={async ({ values }) => {
         await updateUser({
           variables: {
-            id: data.currentUser?.id,
+            id: data.currentUser!.id,
             patch: {
               username: values.username,
               name: values.name,
@@ -277,7 +251,9 @@ function AddEmailForm() {
         <Input type="email" name="email" required />
       </FormRow>
       <div>
-        <Button variant="primary" type="submit">Add email</Button>
+        <Button variant="primary" type="submit">
+          Add email
+        </Button>
       </div>
       <FormErrors />
     </Form>
@@ -299,7 +275,7 @@ function UnlinkAccountButton({ id }: { id: string }) {
   }
 
   return (
-    <div>
+    <>
       {modalOpen ? (
         <div>
           <b>Are you sure?</b>
@@ -316,12 +292,13 @@ function UnlinkAccountButton({ id }: { id: string }) {
             </Button>
           </div>
         </div>
-      ) : null}
-      <Button disabled={deleting} onClick={() => setModalOpen(true)}>
-        Unlink
-      </Button>
+      ) : (
+        <Button disabled={deleting} onClick={() => setModalOpen(true)}>
+          Unlink
+        </Button>
+      )}
       <FormErrors errors={errors} />
-    </div>
+    </>
   );
 }
 
@@ -341,7 +318,7 @@ function LinkedAccounts({ data }: { data: SettingsQuery }) {
   );
 }
 
-function DeleteAccount() {
+function DeleteAccount({ token }: { token?: string }) {
   const [requestAccountDeletion] = useRequestAccountDeletionMutation();
   const [confirmAccountDeletion] = useConfirmAccountDeletionMutation();
   const [errors, setErrors] = useState<string | null>(null);
@@ -349,9 +326,8 @@ function DeleteAccount() {
   const [deleted, setDeleted] = useState(false);
   const [itIsDone, setItIsDone] = useState(false);
   const [doingIt, setDoingIt] = useState(false);
-  const [params] = useSearchParams();
   const logout = useLogout();
-  const token = params.get("delete_token");
+  const navigate = useNavigate()
   function doIt() {
     setErrors(null);
     setDoingIt(true);

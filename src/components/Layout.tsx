@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorBoundary as DefaultErrorBoundary } from "react-error-boundary";
-import { NavLink, NavLinkProps, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, NavLinkProps, Navigate, useLocation } from "react-router-dom";
 import {
   SharedLayoutQuery,
   SharedLayout_QueryFragment,
@@ -16,7 +16,7 @@ const appTitle = "pglslim";
 const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
   return clsx(
     route.isActive ? "font-bold decoration-primary-200" : "decoration-primary-400",
-    "underline hover:decoration-primary-200 decoration-thick decoration-2",
+    "decoration-thick underline decoration-2 hover:decoration-primary-200",
   );
 };
 
@@ -45,13 +45,7 @@ function Nav({ currentUser }: { currentUser: SharedLayoutQuery["currentUser"] })
                   </NavLink>
                 </li>
                 <li>
-                  <a
-                    href="/logout"
-                    className={NavStyles?.({})}
-                    onClick={() => {
-                      void logout();
-                    }}
-                  >
+                  <a href="/logout" className={NavStyles?.({})} onClick={logout}>
                     sign out
                   </a>
                 </li>
