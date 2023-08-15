@@ -5,3 +5,5 @@ src/generated/
 .eslintcache
 dist
 .swc
+.ethereal
+*error.log
