@@ -1,6 +1,6 @@
-import express, { Express, NextFunction } from "express";
-import { IncomingMessage, Server, ServerResponse } from "node:http";
-import { Duplex } from "stream";
+import express, { type Express, type NextFunction } from "express";
+import type { IncomingMessage, Server, ServerResponse } from "node:http";
+import type { Duplex } from "stream";
 
 import { cloudflareIps } from "./cloudflare";
 import {

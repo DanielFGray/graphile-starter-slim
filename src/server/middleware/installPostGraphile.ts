@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { grafserv } from "grafserv/express/v4";
+import { grafserv } from "postgraphile/grafserv/express/v4";
 import { ServerResponse } from "node:http";
 import { OutgoingHttpHeaders } from "node:http2";
 import { postgraphile } from "postgraphile";
@@ -14,12 +14,7 @@ export async function installPostGraphile(app: Express) {
   const rootPgPool = getRootPgPool(app);
   const httpServer = getHttpServer(app);
 
-  const pgl = postgraphile(
-    getPreset({
-      authPgPool,
-      rootPgPool,
-    }),
-  );
+  const pgl = postgraphile(getPreset({ authPgPool, rootPgPool }));
 
   app.set("pgl", pgl);
 

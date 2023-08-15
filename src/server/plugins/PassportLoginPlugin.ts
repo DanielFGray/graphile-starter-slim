@@ -1,6 +1,6 @@
 import { PgClassExpressionStep } from "@dataplan/pg";
 import { access } from "grafast";
-import { gql, makeExtendSchemaPlugin, Plans, Resolvers } from "graphile-utils";
+import { gql, makeExtendSchemaPlugin, Plans, Resolvers } from "postgraphile/utils";
 
 import type {} from "../middleware/installPostGraphile";
 import { ERROR_MESSAGE_OVERRIDES } from "../utils/handleErrors";

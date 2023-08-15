@@ -1,14 +1,11 @@
 /* eslint-disable no-console */
-import { createServer, IncomingMessage } from "node:http";
+import { createServer, type IncomingMessage } from "node:http";
 import { Duplex } from "node:stream";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import chalk from "chalk";
-
 import { getShutdownActions, getUpgradeHandlers, makeApp } from "./app";
 
-const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
-
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV !== "production";
 
 async function main() {
   // Create our HTTP server
@@ -48,16 +45,18 @@ async function main() {
     httpServer.addListener("upgrade", handleUpgrade);
   }
 
+  const packageJson = JSON.parse(await fs.readFile("./package.json", "utf8"));
+
   // And finally, we open the listen port
-  const PORT = parseInt(process.env.PORT || "", 10) || 3000;
-  httpServer.listen(PORT, () => {
+  const port = Number(process.env.PORT) || 3000;
+  httpServer.listen(port, () => {
     const address = httpServer.address();
     const actualPort: string =
       typeof address === "string"
         ? address
         : address && address.port
         ? String(address.port)
-        : String(PORT);
+        : String(port);
     console.log();
     console.log(
       chalk.green(`${chalk.bold(packageJson.name)} listening on port ${chalk.bold(actualPort)}`),
