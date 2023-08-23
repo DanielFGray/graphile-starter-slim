@@ -12,8 +12,6 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
-import rdtStylesheet from "remix-development-tools/stylesheet.css";
-import { RemixDevTools } from "remix-development-tools";
 
 export const meta: V2_MetaFunction = () => [
   { name: "viewport", content: "width=device-width,initial-scale=1" },
@@ -23,7 +21,6 @@ export const meta: V2_MetaFunction = () => [
 export const links: LinksFunction = () => {
   return [
     ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-    ...(rdtStylesheet ? [{ rel: "stylesheet", href: rdtStylesheet }] : []),
     { rel: "stylesheet", href: tailwindcss },
   ];
 };
@@ -42,7 +39,6 @@ export default function App() {
         {process.env.NODE_ENV === "development" && (
           <>
             <LiveReload />
-            <RemixDevTools />
           </>
         )}
       </body>

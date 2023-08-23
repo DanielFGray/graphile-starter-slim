@@ -105,8 +105,8 @@
     "@types/node": "^20.4.2",
     "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
     "autoprefixer": "^10.4.14",
     "dotenv": "^16.0.3",
     "eslint": "^8.43.0",
@@ -118,14 +118,11 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.24",
     "prettier": "^3.0.1",
-    "prettier-plugin-tailwindcss": "^0.4.1",
-    "remix-development-tools": "^1.0.6",
+    "prettier-plugin-tailwindcss": "^0.5.3",
+    "remix-development-tools": "^2.1.4",
     "tailwindcss": "^3.3.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.1.3"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   },
   "resolutions": {
     "graphql": "16.1.0-experimental-stream-defer.6"

@@ -8,11 +8,17 @@ import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 
-startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>,
-  );
-});
+const callback = () =>
+  startTransition(() => {
+    hydrateRoot(document, <RemixBrowser />);
+  });
+
+if (process.env.NODE_ENV === "development") {
+  import("remix-development-tools").then(rdt => {
+    // Add all the dev tools props here into the client
+    rdt.initClient();
+    callback();
+  });
+} else {
+  callback();
+}
