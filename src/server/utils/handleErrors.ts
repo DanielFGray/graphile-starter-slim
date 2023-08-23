@@ -25,17 +25,20 @@ const ERROR_PROPERTIES_TO_EXPOSE =
 
 // This would be better as a macro...
 const pluck = (err: any): { [key: string]: any } => {
-  return ERROR_PROPERTIES_TO_EXPOSE.reduce((memo, key) => {
-    const value =
-      key === "code"
-        ? // err.errcode is equivalent to err.code; replace it
-          err.code || err.errcode
-        : err[key];
-    if (value != null) {
-      memo[key] = value;
-    }
-    return memo;
-  }, Object.create(null) as Record<string, any>);
+  return ERROR_PROPERTIES_TO_EXPOSE.reduce(
+    (memo, key) => {
+      const value =
+        key === "code"
+          ? // err.errcode is equivalent to err.code; replace it
+            err.code || err.errcode
+          : err[key];
+      if (value != null) {
+        memo[key] = value;
+      }
+      return memo;
+    },
+    Object.create(null) as Record<string, any>,
+  );
 };
 
 /**

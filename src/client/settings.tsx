@@ -327,7 +327,7 @@ function DeleteAccount({ token }: { token?: string }) {
   const [itIsDone, setItIsDone] = useState(false);
   const [doingIt, setDoingIt] = useState(false);
   const logout = useLogout();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   function doIt() {
     setErrors(null);
     setDoingIt(true);

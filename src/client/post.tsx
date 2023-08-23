@@ -22,9 +22,7 @@ export function PostCard(post: PostFieldsFragment) {
       )}
       <ul className="flex flex-row flex-wrap items-baseline gap-4">
         <Tag>by {post.user?.username}</Tag>
-        {post.tags?.map(p => (
-          <Tag key={p} children={p} />
-        ))}
+        {post.tags?.map(p => <Tag key={p} children={p} />)}
         <Tag>{ago(createdDate)}</Tag>
       </ul>
     </div>

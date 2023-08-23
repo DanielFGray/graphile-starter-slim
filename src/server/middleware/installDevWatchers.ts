@@ -13,7 +13,7 @@ export async function installDevWatchers(app: Express) {
     // do some magic
     // if (file.endsWith('.graphql') codegen.generate();
     // if (file.endsWith('.sql') migrate.run();
-    console.log(event, file.replace(process.cwd(), ''));
+    console.log(event, file.replace(process.cwd(), ""));
   });
 
   app.set("viteDevServer", viteDevServer);
