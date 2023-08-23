@@ -246,7 +246,7 @@ export function SocialLogin({
 }) {
   if (SocialLoginServices.length < 1) return null;
   return (
-    <div className="text-center">
+    <div className="flex flex-col gap-4 items-center">
       {SocialLoginServices.map(service => (
         <Button variant="primary" key={service}>
           <a
