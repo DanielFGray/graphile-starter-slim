@@ -1,13 +1,6 @@
-import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [
-    react({
-      plugins: [
-        // this segfaults for some reason
-        // ['@graphql-codegen/client-preset-swc-plugin', { artifactDirectory: './src/generated', gqlTagName: 'graphql' }],
-      ],
-    }),
-  ],
+  plugins: [react()],
 });
