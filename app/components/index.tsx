@@ -1,5 +1,6 @@
 import React from "react";
 import { ensureArray } from "../lib";
+import { formatter } from "./postformatter";
 
 export * from "./Layout";
 export * from "./Post";
@@ -258,6 +259,14 @@ export function SocialLogin({
           </a>
         </Button>
       ))}
+    </div>
+  );
+}
+
+export function UserContent({ text }: { text: string }) {
+  return (
+    <div className="prose dark:prose-invert max-w-max max-h-[70vh] text-lg overflow-auto">
+      {formatter(text)}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Card } from "~/components";
+import { Card, UserContent } from "~/components";
 import { type PostFieldsFragment } from "~/generated";
 import ago from "s-ago";
 
@@ -8,11 +8,7 @@ export function Post(post: PostFieldsFragment) {
     <Card>
       <h2 className="text-3xl font-bold">{post.title}</h2>
       {!post.body ? null : (
-        <div className="prose dark:prose-invert max-h-[80vh] overflow-auto">
-          {post.body.split("\n\n+").map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-        </div>
+        <UserContent text={post.body} />
       )}
       <ul className="flex flex-row flex-wrap items-baseline gap-2">
         <span className="bg-primary-700 dark:bg-primary-600 p-1 text-primary-100">
