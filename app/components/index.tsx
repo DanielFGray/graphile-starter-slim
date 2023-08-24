@@ -165,13 +165,15 @@ export function Legend<T>({
   );
 }
 
-export function FormErrors(props: { errors?: null | string | Error | Array<string | Error> }) {
+export function FormErrors(props: {
+  errors?: null | React.ReactNode | string | Error | Array<string | Error>;
+}) {
   if (!props.errors) return null;
   const errs = ensureArray(props.errors);
   return (
     <Container>
       {errs.map(err => {
-        const msg = typeof err === "string" ? err : err.message;
+        const msg = err instanceof Error ? err.message : err;
         return (
           <Danger as="div" key={msg}>
             {msg}
