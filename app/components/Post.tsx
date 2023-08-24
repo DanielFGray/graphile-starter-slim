@@ -24,3 +24,11 @@ export function Post(post: PostFieldsFragment) {
     </Card>
   );
 }
+
+export function PostList({ posts }: { posts: null | undefined | PostFieldsFragment[] }) {
+  return (
+    <div className="md:flex flex-row flex-wrap gap-4 p-4 space-y-4 md:space-y-0">
+      {posts?.map(post => <Post key={post.id} {...post} />)}
+    </div>
+  );
+}
