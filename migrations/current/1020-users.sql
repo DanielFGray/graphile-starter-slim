@@ -19,6 +19,7 @@ create table app_public.users (
   name text,
   avatar_url app_public.url,
   role app_public.user_role not null default 'user',
+  bio text not null check(length(bio) <= 4000) default '',
   is_verified boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -36,7 +37,7 @@ create policy select_all on app_public.users for select using (true);
 create policy update_self on app_public.users for update using (id = app_public.current_user_id());
 grant select on app_public.users to :DATABASE_VISITOR;
 -- NOTE: `insert` is not granted, because we'll handle that separately
-grant update(username, name, avatar_url) on app_public.users to :DATABASE_VISITOR;
+grant update(username, name, bio, avatar_url) on app_public.users to :DATABASE_VISITOR;
 -- NOTE: `delete` is not granted, because we require confirmation via request_account_deletion/confirm_account_deletion
 
 comment on table app_public.users is

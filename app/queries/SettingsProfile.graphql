@@ -2,6 +2,7 @@ query ProfileSettings {
   ...SharedLayout_Query
   currentUser {
     id
+    bio
     isVerified
     hasPassword
     userEmails(first: 50) {

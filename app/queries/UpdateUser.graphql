@@ -4,6 +4,7 @@ mutation UpdateUser($id: UUID!, $patch: UserPatch!) {
     user {
       id
       name
+      bio
       username
     }
   }
