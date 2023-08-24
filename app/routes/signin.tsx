@@ -57,7 +57,6 @@ export async function action({ request, context: { graphql } }: ActionArgs) {
   const params = Object.fromEntries(searchParams);
   if (!("username" in variables)) throw new Error("missing username");
   if (!("password" in variables)) throw new Error("missing password");
-  console.log({ params, searchParams });
   const { data, errors } = await graphql(LoginDocument, variables);
   if (errors) throw errors;
   if (!data?.login?.user.id) throw new Error("error in login?");

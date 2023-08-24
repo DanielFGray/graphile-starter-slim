@@ -61,12 +61,7 @@ export default function ResetPage() {
     </Layout>
   );
 }
-/*
-        {!(userId && token) ? (
-          <Card className="text-center">Missing user id and token</Card>
-        ) : (
-        )}
-*/
+
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const values = Object.fromEntries(await request.formData());
   const result = await graphql(ResetPasswordDocument, values);

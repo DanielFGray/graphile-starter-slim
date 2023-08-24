@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   type EmailsForm_UserEmailFragment,
   ProfileSettingsDocument,
@@ -374,8 +374,8 @@ export async function action({ request, context: { graphql } }: ActionArgs) {
         return json(result);
       }
       case "unlinkUserAuth": {
-        const result = await graphql(UnlinkUserAuthenticationDocument, formdata)
-        return json(result)
+        const result = await graphql(UnlinkUserAuthenticationDocument, formdata);
+        return json(result);
       }
       case "requestAccountDeletion": {
         const result = await graphql(RequestAccountDeletionDocument);

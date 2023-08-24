@@ -43,7 +43,6 @@ export default function ForgotPassword() {
 }
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const values = Object.fromEntries(await request.formData());
-  console.log("received reset request for", values);
   const { data } = await graphql(ForgotPasswordDocument, values);
   return json(data);
 }

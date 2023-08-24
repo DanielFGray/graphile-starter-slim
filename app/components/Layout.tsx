@@ -88,7 +88,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Nav currentUser={currentUser} />
-      <ErrorBoundary><main>{children}</main></ErrorBoundary>
+      <ErrorBoundary>
+        <main>{children}</main>
+      </ErrorBoundary>
     </>
   );
 }
