@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import tailwindcss from "~/tailwind.css";
@@ -20,11 +21,12 @@ export const meta: V2_MetaFunction = () => [
 ];
 export const links: LinksFunction = () => {
   return [
-    ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+    // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
     { rel: "stylesheet", href: tailwindcss },
   ];
 };
 
+const RemixDevTools = process.env.NODE_ENV === "development" ? lazy(() => import("remix-development-tools")) : null;
 export default function App() {
   return (
     <html lang="en">
@@ -39,6 +41,11 @@ export default function App() {
         {process.env.NODE_ENV === "development" && (
           <>
             <LiveReload />
+            {RemixDevTools ? (
+              <Suspense>
+                <RemixDevTools />
+              </Suspense>
+            ) : null}
           </>
         )}
       </body>
