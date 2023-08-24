@@ -25,6 +25,7 @@ create table app_public.users (
   updated_at timestamptz not null default now()
 );
 alter table app_public.users enable row level security;
+create index idx_users_username on app_public.users (username);
 
 -- We couldn't implement this relationship on the sessions table until the users table existed!
 alter table app_private.sessions

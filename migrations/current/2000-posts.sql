@@ -24,7 +24,7 @@ create table app_public.posts (
 
 comment on column app_public.posts.int_id is '@omit';
 
-create index on app_public.posts (id, user_id);
+create index on app_public.posts (user_id);
 create index on app_public.posts using gin (tags);
 create index on app_public.posts (created_at desc);
 

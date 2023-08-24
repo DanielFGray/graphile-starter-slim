@@ -2,7 +2,14 @@ import React from "react";
 import { SharedLayoutQuery, type SharedLayout_UserFragment } from "~/generated";
 import { Button, clsx } from "~/components";
 import { useLogout } from "../lib";
-import { NavLink, type NavLinkProps, useNavigate, useLocation, useLoaderData } from "@remix-run/react";
+import {
+  NavLink,
+  type NavLinkProps,
+  useNavigate,
+  useLocation,
+  useLoaderData,
+  Link,
+} from "@remix-run/react";
 import { ErrorBoundary as DefaultErrorBoundary } from "react-error-boundary";
 
 const NavStyles: NavLinkProps["className"] = function NavStyles(route) {
@@ -30,7 +37,10 @@ function Nav({ currentUser }: { currentUser: null | SharedLayout_UserFragment })
             {currentUser ? (
               <>
                 <div className="border-r border-primary-400 pr-4">
-                  signed in as <span className="font-bold">{currentUser.username}</span>
+                  {"signed in as "}
+                  <Link to={`/user/${currentUser.username}`} className={clsx('font-bold', NavStyles?.({}))}>
+                    {currentUser.username}
+                  </Link>
                 </div>
                 <li>
                   <NavLink to="/settings" className={NavStyles}>
