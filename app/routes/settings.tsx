@@ -39,7 +39,7 @@ export default function SettingsPage() {
   const deleteToken = params.get("delete_token");
   return (
     <Layout>
-      <Container className="mx-auto mb-4 max-w-4xl">
+      <Container className="lg:mx-auto m-4 sm:max-w-4xl">
         {deleteToken ? (
           <DeleteAccount token={deleteToken} />
         ) : (
@@ -158,9 +158,13 @@ function EmailSettings() {
           </Container>
           <FormErrors
             errors={
-              data?.currentUser && data?.currentUser.isVerified
-                ? null
-                : `You do not have any verified email addresses, this will make account recovery impossible and may limit your available functionality within this application. Please complete email verification.`
+              data?.currentUser && data?.currentUser.isVerified ? null : (
+                <Danger as="small" className="text-sm tracking-tight leading-3">
+                  You do not have any verified email addresses, this will make account recovery
+                  impossible and may limit your available functionality within this application.
+                  Please complete email verification.
+                </Danger>
+              )
             }
           />
         </div>
@@ -190,7 +194,13 @@ function Email({
                 : "Pending verification (please check your inbox / spam folder"
             }
           >
-            {email.isVerified ? "✅ " : <Danger as="small">(unverified)</Danger>}
+            {email.isVerified ? (
+              "✅ "
+            ) : (
+              <span className="rounded-md bg-red-300 px-1 py-0.5 text-sm font-bold text-red-900">
+                unverified
+              </span>
+            )}
           </span>
           Added {new Date(Date.parse(email.createdAt)).toLocaleString()}
         </div>
@@ -199,7 +209,7 @@ function Email({
         <input type="hidden" name="emailId" value={email.id} />
         {email.isPrimary && (
           <span
-            className="rounded-md bg-green-300 p-1 pb-1.5 text-sm font-bold text-green-900"
+            className="rounded-md bg-green-300 px-1 py-0.5 text-sm font-bold text-green-900"
             key="primary_indicator"
           >
             Primary

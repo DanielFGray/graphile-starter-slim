@@ -24,7 +24,7 @@ function Nav({ currentUser }: { currentUser: null | SharedLayout_UserFragment })
   const navigate = useNavigate();
   return (
     <header>
-      <nav className="border-primary-540 mb-4 border-b border-primary-500 bg-primary-800 tracking-tight text-primary-100">
+      <nav className="border-primary-540 mb-4 border-b border-primary-500 bg-primary-800 font-medium tracking-tight text-primary-100">
         <ul className="flex flex-row justify-between gap-4 p-4">
           <div>
             <li>
