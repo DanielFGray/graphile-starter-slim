@@ -17,7 +17,7 @@ import { forbidWhen } from "~/lib";
 
 export async function loader({ request, context: { graphql } }: LoaderArgs) {
   const { data } = await graphql(SharedLayoutDocument);
-  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request)
+  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request);
   return json(data);
 }
 

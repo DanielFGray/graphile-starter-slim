@@ -33,21 +33,21 @@ export default function UserProfile() {
   const { posts, ...user } = data.userByUsername;
   return (
     <Layout>
-      <Card className="mx-4 md:mx-auto max-w-2xl">
+      <Card className="mx-4 max-w-2xl md:mx-auto">
         <Container>
-          <div className="flex flex-row gap-4 justify-between dark:text-primary-300">
-            <div className="flex flex-row gap-4 items-center">
-              {user.avatarUrl && <img src={user.avatarUrl} className="rounded-full max-w-[4em]" />}
+          <div className="flex flex-row justify-between gap-4 dark:text-primary-300">
+            <div className="flex flex-row items-center gap-4">
+              {user.avatarUrl && <img src={user.avatarUrl} className="max-w-[4em] rounded-full" />}
               <div>
                 <div className="font-extrabold tracking-tight">
                   <span className="text-4xl">{user.username}</span>
                   {user.role === "ADMIN" && (
-                    <span className="rounded-md ml-2 bg-green-300 px-1 py-0.5 text-sm font-bold text-green-900">
+                    <span className="ml-2 rounded-md bg-green-300 px-1 py-0.5 text-sm font-bold text-green-900">
                       {user.role.toLowerCase()}
                     </span>
                   )}
                   {!user.isVerified && (
-                    <span className="rounded-md ml-2 bg-red-300 px-1 py-0.5 text-sm font-bold text-red-900">
+                    <span className="ml-2 rounded-md bg-red-300 px-1 py-0.5 text-sm font-bold text-red-900">
                       unverified
                     </span>
                   )}
@@ -55,7 +55,7 @@ export default function UserProfile() {
                 <div className="text-lg">{user.name}</div>
               </div>
             </div>
-            <div className="text-sm text-light text-primary-300">
+            <div className="text-light text-sm text-primary-300">
               {"first joined: "}
               {new Date(user.createdAt).toLocaleDateString()}
             </div>
@@ -80,12 +80,12 @@ function ProfileEditor({
   const [params, setParams] = useSearchParams();
   const location = useLocation();
   const showProfileEditor = params.get("showProfileEditor");
-  return ! Boolean(Number(showProfileEditor)) ? (
+  return !Boolean(Number(showProfileEditor)) ? (
     <UserContent editable text={bio} onClick={() => setParams({ showProfileEditor: "1" })} />
   ) : (
     <Form action={location.pathname} method="post">
       <Editor onChange={setNewBio} name="bio" defaultValue={bio} />
-      <div className="flex flex-row mt-2 gap-2">
+      <div className="mt-2 flex flex-row gap-2">
         <Button
           type="submit"
           name="type"

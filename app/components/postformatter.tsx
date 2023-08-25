@@ -1,5 +1,5 @@
 // @ts-nocheck
-import SimpleMarkdown from 'simple-markdown'
+import SimpleMarkdown from "simple-markdown";
 
 const rules: SimpleMarkdown.ParserRules = {
   ...SimpleMarkdown.defaultRules,
@@ -13,26 +13,27 @@ const rules: SimpleMarkdown.ParserRules = {
           title={node.title}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={ev => {ev.stopPropagation()}}
+          onClick={ev => {
+            ev.stopPropagation();
+          }}
         >
           {output(node.content, state)}
         </a>
-      )
+      );
     },
   },
   paragraph: {
     ...SimpleMarkdown.defaultRules.paragraph,
     react: (node, output, state) => {
-      return <p key={state.key}>{output(node.content, state)}</p>
+      return <p key={state.key}>{output(node.content, state)}</p>;
     },
   },
-}
+};
 
-const parser = SimpleMarkdown.parserFor(rules)
-const reactOutput = SimpleMarkdown.outputFor(rules, 'react')
+const parser = SimpleMarkdown.parserFor(rules);
+const reactOutput = SimpleMarkdown.outputFor(rules, "react");
 
 export function FromMarkdown({ source }: { source: string }): JSX.Element {
   // Many rules require content to end in \n\n to be interpreted as a block.
-  return reactOutput(parser(source + '\n\n', { inline: false }))
+  return reactOutput(parser(source + "\n\n", { inline: false }));
 }
-

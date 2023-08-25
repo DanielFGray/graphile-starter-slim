@@ -76,14 +76,14 @@ export function Editor({
             <ContentEditable
               className={`
                 prose
-                dark:prose-invert
                 rounded
+                p-2
                 outline
                 outline-2
                 outline-primary-500
+                dark:prose-invert
                 focus:outline-primary-400
                 dark:placeholder:text-primary-400
-                p-2
               `}
             />
           }

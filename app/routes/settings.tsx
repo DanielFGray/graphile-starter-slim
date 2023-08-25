@@ -39,7 +39,7 @@ export default function SettingsPage() {
   const deleteToken = params.get("delete_token");
   return (
     <Layout>
-      <Container className="lg:mx-auto m-4 sm:max-w-4xl">
+      <Container className="m-4 sm:max-w-4xl lg:mx-auto">
         {deleteToken ? (
           <DeleteAccount token={deleteToken} />
         ) : (
@@ -150,7 +150,7 @@ function EmailSettings() {
           <FormErrors
             errors={
               data?.currentUser && data?.currentUser.isVerified ? null : (
-                <Danger as="small" className="text-sm tracking-tight leading-3">
+                <Danger as="small" className="text-sm leading-3 tracking-tight">
                   You do not have any verified email addresses, this will make account recovery
                   impossible and may limit your available functionality within this application.
                   Please complete email verification.

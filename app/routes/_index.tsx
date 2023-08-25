@@ -14,7 +14,7 @@ export default function Index() {
   return (
     <Layout>
       {!data?.currentUser ? null : (
-        <Form method="post" className="px-4 mx-auto max-w-3xl">
+        <Form method="post" className="mx-auto max-w-3xl px-4">
           <Card as="fieldset">
             <Legend>new post</Legend>
             <Container>

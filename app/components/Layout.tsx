@@ -38,7 +38,10 @@ function Nav({ currentUser }: { currentUser: null | SharedLayout_UserFragment })
               <>
                 <div className="border-r border-primary-400 pr-4">
                   {"signed in as "}
-                  <Link to={`/user/${currentUser.username}`} className={clsx('font-bold', NavStyles?.({}))}>
+                  <Link
+                    to={`/user/${currentUser.username}`}
+                    className={clsx("font-bold", NavStyles?.({}))}
+                  >
                     {currentUser.username}
                   </Link>
                 </div>

@@ -13,7 +13,7 @@ function Tag<T extends keyof React.JSX.IntrinsicElements>({
   return (
     <As
       {...props}
-      className="bg-primary-200 dark:bg-primary-600 p-1 rounded dark:text-primary-300"
+      className="rounded bg-primary-200 p-1 dark:bg-primary-600 dark:text-primary-300"
     />
   );
 }
@@ -26,7 +26,7 @@ export function Post(post: PostFieldsFragment) {
         <h2 className="text-3xl font-bold">{post.title}</h2>
       </Link>
       {!post.body ? null : <UserContent text={post.body} />}
-      <ul className="flex flex-row flex-wrap text-xs font-medium tracking-tight -mx-1 items-baseline gap-2">
+      <ul className="-mx-1 flex flex-row flex-wrap items-baseline gap-2 text-xs font-medium tracking-tight">
         <Link to={`/user/${post.user?.username}`}>
           <Tag>
             by <span className="font-bold">{post.user?.username}</span>
@@ -47,7 +47,7 @@ export function Post(post: PostFieldsFragment) {
 
 export function PostList({ posts }: { posts: null | undefined | PostFieldsFragment[] }) {
   return (
-    <div className="md:flex flex-row flex-wrap gap-4 p-4 space-y-4 md:space-y-0">
+    <div className="flex-row flex-wrap gap-4 space-y-4 p-4 md:flex md:space-y-0">
       {posts?.map(post => <Post key={post.id} {...post} />)}
     </div>
   );

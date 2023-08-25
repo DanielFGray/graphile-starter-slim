@@ -248,7 +248,7 @@ export function SocialLogin({
 }) {
   if (SocialLoginServices.length < 1) return null;
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col items-center gap-4">
       {SocialLoginServices.map(service => (
         <Button variant="primary" key={service}>
           <a
@@ -264,21 +264,25 @@ export function SocialLogin({
   );
 }
 
-export function UserContent(props: {
-  editable: true;
-  onClick: () => void;
-  text: string;
-} | {
-  text: string;
-}) {
+export function UserContent(
+  props:
+    | {
+        editable: true;
+        onClick: () => void;
+        text: string;
+      }
+    | {
+        text: string;
+      },
+) {
   if ("editable" in props && props.editable) {
     return (
-      <button className="group background-transparent text-left" onClick={props.onClick}>
-        <div className="cursor-pointer group-hover:outline-2 prose dark:prose-invert group-hover:outline group-hover:outline-primary-300 dark:group-hover:outline-primary-500 rounded p-2">
+      <button className="background-transparent group text-left" onClick={props.onClick}>
+        <div className="prose cursor-pointer rounded p-2 dark:prose-invert group-hover:outline group-hover:outline-2 group-hover:outline-primary-300 dark:group-hover:outline-primary-500">
           <FromMarkdown source={props.text} />
         </div>
-        <div className="group-hover:visible invisible relative -top-3 left-2">
-          <span className="px-1 rounded dark:text-primary-900 text-primary-800 z-10 dark:bg-primary-500 bg-primary-300 text-xs">
+        <div className="invisible relative -top-3 left-2 group-hover:visible">
+          <span className="z-10 rounded bg-primary-300 px-1 text-xs text-primary-800 dark:bg-primary-500 dark:text-primary-900">
             edit
           </span>
         </div>
@@ -286,7 +290,7 @@ export function UserContent(props: {
     );
   }
   return (
-    <div className={clsx("prose dark:prose-invert max-w-max max-h-[70vh] overflow-auto")}>
+    <div className={clsx("prose max-h-[70vh] max-w-max overflow-auto dark:prose-invert")}>
       <FromMarkdown source={props.text} />
     </div>
   );

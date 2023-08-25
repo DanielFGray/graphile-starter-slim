@@ -26,7 +26,8 @@ export const links: LinksFunction = () => {
   ];
 };
 
-const RemixDevTools = process.env.NODE_ENV === "development" ? lazy(() => import("remix-development-tools")) : null;
+const RemixDevTools =
+  process.env.NODE_ENV === "development" ? lazy(() => import("remix-development-tools")) : null;
 export default function App() {
   return (
     <html lang="en">

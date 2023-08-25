@@ -71,7 +71,7 @@ enum AuthRestrict {
 export function forbidWhen(
   when: (auth: typeof AuthRestrict) => AuthRestrict,
   currentUser: undefined | null | SharedLayout_UserFragment,
-  request: Request
+  request: Request,
 ) {
   const forbidWhen = when(AuthRestrict);
   const forbidsLoggedOut = forbidWhen & AuthRestrict.LOGGED_OUT;
@@ -79,9 +79,9 @@ export function forbidWhen(
   const forbidsNotMod = forbidWhen & AuthRestrict.NOT_MOD;
   const forbidsNotAdmin = forbidWhen & AuthRestrict.NOT_ADMIN;
   if (currentUser && (forbidsLoggedIn || (forbidsNotAdmin && currentUser.role !== "ADMIN"))) {
-    throw redirect('/')
+    throw redirect("/");
   } else if (currentUser == null && forbidsLoggedOut) {
-    const location = new URL(request.url)
+    const location = new URL(request.url);
     throw redirect(`/signup?redirectTo=${encodeURIComponent(location.pathname)}`);
   }
 }
