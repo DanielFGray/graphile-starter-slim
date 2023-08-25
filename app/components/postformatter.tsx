@@ -39,3 +39,4 @@ export function formatter(source: string): React.ReactNode {
   const outputResult = reactOutput(parseTree)
   return outputResult
 }
+

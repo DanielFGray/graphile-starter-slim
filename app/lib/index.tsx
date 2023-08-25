@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import { useNavigate } from "react-router-dom";
-import { startTransition } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { redirect } from "@remix-run/node";
 import { SharedLayout_UserFragment } from "~/generated";
 
@@ -84,4 +84,30 @@ export function forbidWhen(
     const location = new URL(request.url)
     throw redirect(`/signup?redirectTo=${encodeURIComponent(location.pathname)}`);
   }
+}
+
+export function usePointerInteractions() {
+  const [isPointerDown, setIsPointerDown] = useState(false);
+  const [isPointerReleased, setIsPointerReleased] = useState(true);
+
+  useEffect(() => {
+    const handlePointerUp = () => {
+      setIsPointerDown(false);
+      setIsPointerReleased(true);
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    const handlePointerDown = () => {
+      setIsPointerDown(true);
+      setIsPointerReleased(false);
+      document.addEventListener("pointerup", handlePointerUp);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
+
+  return { isPointerDown, isPointerReleased };
 }

@@ -81,15 +81,6 @@ function UserProfile() {
               placeholder="name"
             />
           </FormRow>
-          <FormRow label="bio:">
-            <Input
-              type="textarea"
-              name="bio"
-              defaultValue={data?.currentUser?.bio}
-              placeholder="bio"
-              maxLength={4000}
-            />
-          </FormRow>
           <div>
             <Button type="submit" name="type" value="updateProfile">
               update
