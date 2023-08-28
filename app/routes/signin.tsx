@@ -15,9 +15,9 @@ import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/nod
 import { forbidWhen } from "~/lib";
 
 export async function loader({ request, context: { graphql } }: LoaderArgs) {
-  const { data } = await graphql(SharedLayoutDocument);
-  forbidWhen(auth => auth.LOGGED_IN, data?.currentUser, request);
-  return json(data);
+  const result = await graphql(SharedLayoutDocument);
+  forbidWhen(auth => auth.LOGGED_IN, result.data?.currentUser, request);
+  return json(result);
 }
 
 export default function Login() {

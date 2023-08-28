@@ -84,7 +84,7 @@ function Nav({ currentUser }: { currentUser: null | SharedLayout_UserFragment })
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const data = useLoaderData();
+  const { data } = useLoaderData();
   if (!(data && "currentUser" in data)) throw new Error("missing user data!");
   const currentUser = data.currentUser as null | SharedLayout_UserFragment;
 

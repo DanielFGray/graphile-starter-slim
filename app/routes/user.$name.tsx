@@ -16,12 +16,12 @@ import {
 import { UpdateUserDocument, User, UserProfileDocument, UserProfileQuery } from "~/generated";
 
 export async function loader({ params, context: { graphql } }: LoaderArgs) {
-  const { data } = await graphql(UserProfileDocument, { username: params.name! });
-  return json(data, { status: data?.userByUsername ? 200 : 404 });
+  const result = await graphql(UserProfileDocument, { username: params.name! });
+  return json(result, { status: result.data?.userByUsername ? 200 : 404 });
 }
 
 export default function UserProfile() {
-  const data = useLoaderData<typeof loader>()!;
+  const { data } = useLoaderData<typeof loader>()!;
   if (!data.userByUsername)
     return (
       <Layout>

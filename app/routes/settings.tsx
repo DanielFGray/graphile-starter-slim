@@ -29,9 +29,9 @@ import { type ActionArgs, type LoaderArgs, json } from "@remix-run/node";
 import { useSearchParams, Form, useActionData, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, context: { graphql } }: LoaderArgs) {
-  const { data } = await graphql(ProfileSettingsDocument, {});
-  forbidWhen(auth => auth.LOGGED_OUT, data?.currentUser, request);
-  return json(data);
+  const result = await graphql(ProfileSettingsDocument, {});
+  forbidWhen(auth => auth.LOGGED_OUT, result.data?.currentUser, request);
+  return json(result);
 }
 
 export default function SettingsPage() {
@@ -57,7 +57,7 @@ export default function SettingsPage() {
 }
 
 function UserProfile() {
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   return (
     <Form method="POST" action="/settings">
       <input type="hidden" name="id" value={data?.currentUser?.id} />
@@ -95,7 +95,7 @@ function UserProfile() {
 
 function PasswordSettings() {
   // const [changePassword, changePasswordMutation] = ChangePasswordDocument();
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   const response = useActionData<typeof action>();
   return (
     <Form method="POST" action="/settings">
@@ -132,7 +132,7 @@ function PasswordSettings() {
 }
 
 function EmailSettings() {
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   return (
     <Card as="fieldset">
       <Legend>email settings</Legend>
@@ -259,7 +259,7 @@ function AddEmailForm() {
 }
 
 function LinkedAccounts() {
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   return (
     <Card as="fieldset">
       <Legend>manage linked accounts</Legend>

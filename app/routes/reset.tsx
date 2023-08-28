@@ -5,8 +5,8 @@ import { Button, Card, Container, FormErrors, FormRow, Input, Layout, Legend } f
 import { ResetPasswordDocument, SharedLayoutDocument } from "~/generated";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
-  const { data } = await graphql(SharedLayoutDocument);
-  return json(data);
+  const result = await graphql(SharedLayoutDocument);
+  return json(result);
 }
 
 export default function ResetPage() {
