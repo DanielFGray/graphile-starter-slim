@@ -1,11 +1,8 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
+import graphqlconfig from './graphql.config.js'
 
 const config: CodegenConfig = {
-  schema: "./app/generated/schema.graphql",
-  documents: [
-    "./app/queries/**/*.graphql",
-    // "./app/routes/**/*.tsx",
-  ],
+  ...graphqlconfig,
   config: {
     scalars: {
       UUID: "string",
