@@ -1,0 +1,5 @@
+mutation DeletePost($id: Int!) {
+  deletePost(input: { id: $id }) {
+    clientMutationId
+  }
+}

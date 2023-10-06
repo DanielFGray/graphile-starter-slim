@@ -1,0 +1,8 @@
+query usernameSearch($substr: String!, $matchType: SearchMatchType!) {
+  usernameSearch(substr: $substr, matchType: $matchType) {
+    nodes {
+      username
+      avatarUrl
+    }
+  }
+}

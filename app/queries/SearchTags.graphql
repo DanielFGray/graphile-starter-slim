@@ -1,0 +1,8 @@
+query searchTags($substr: String!) {
+  searchTags(substr: $substr) {
+    nodes {
+      tag
+      count
+    }
+  }
+}

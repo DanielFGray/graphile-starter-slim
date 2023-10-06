@@ -8,9 +8,7 @@ import {
   FormErrors,
   Layout,
   PostList,
-  Stringify,
   UserContent,
-  Editor,
   Input,
 } from "~/components";
 import { UpdateUserDocument, User, UserProfileDocument, UserProfileQuery } from "~/generated";
@@ -35,7 +33,7 @@ export default function UserProfile() {
     <Layout>
       <Card className="mx-4 max-w-2xl md:mx-auto">
         <Container>
-          <div className="flex flex-row justify-between gap-4 dark:text-primary-300">
+          <div className="flex flex-row justify-between gap-4 dark:text-primary-200">
             <div className="flex flex-row items-center gap-4">
               {user.avatarUrl && <img src={user.avatarUrl} className="max-w-[4em] rounded-full" />}
               <div>
@@ -55,7 +53,7 @@ export default function UserProfile() {
                 <div className="text-lg">{user.name}</div>
               </div>
             </div>
-            <div className="text-light text-sm text-primary-300">
+            <div className="text-light text-sm text-primary-400">
               {"first joined: "}
               {new Date(user.createdAt).toLocaleDateString()}
             </div>
@@ -76,7 +74,6 @@ function ProfileEditor({
   id,
   bio,
 }: Pick<NonNullable<UserProfileQuery["userByUsername"]>, "bio"> & UserProfileQuery["currentUser"]) {
-  const [newBio, setNewBio] = useState(bio);
   const [params, setParams] = useSearchParams();
   const location = useLocation();
   const showProfileEditor = params.get("showProfileEditor");
@@ -84,7 +81,7 @@ function ProfileEditor({
     <UserContent editable text={bio} onClick={() => setParams({ showProfileEditor: "1" })} />
   ) : (
     <Form action={location.pathname} method="post">
-      <Editor onChange={setNewBio} name="bio" defaultValue={bio} />
+      <Input type="textarea" name="bio" defaultValue={bio} />
       <div className="mt-2 flex flex-row gap-2">
         <Button
           type="submit"
@@ -98,7 +95,6 @@ function ProfileEditor({
         <Button type="reset" onClick={() => setParams({ showProfileEditor: "0" })}>
           Cancel
         </Button>
-        <input type="hidden" name="bio" value={newBio} />
         <input type="hidden" name="id" value={id} />
       </div>
     </Form>

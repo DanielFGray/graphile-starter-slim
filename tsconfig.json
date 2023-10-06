@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "moduleResolution": "nodenext",
+    "module": "nodenext",
     "resolveJsonModule": true,
     "target": "esnext",
     "strict": true,

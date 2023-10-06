@@ -4,12 +4,12 @@ import { Layout, Card, Legend, Container, Input, FormErrors, Button, PostList } 
 import { CreatePostDocument, LatestPostsDocument } from "~/generated";
 
 export async function loader({ context: { graphql } }: LoaderArgs) {
-  const { data } = await graphql(LatestPostsDocument);
-  return json(data);
+  const result = await graphql(LatestPostsDocument);
+  return json(result);
 }
 
 export default function Index() {
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   return (
     <Layout>
@@ -18,7 +18,6 @@ export default function Index() {
           <Card as="fieldset">
             <Legend>new post</Legend>
             <Container>
-              <Input placeholder="title" type="text" name="title" required />
               <Input placeholder="body" type="textarea" name="body" required />
               <div className="flex flex-row gap-4 [&>*]:grow">
                 <Button variant="primary" disabled={navigation.state !== "idle"} type="submit">
@@ -38,7 +37,6 @@ export default function Index() {
 
 export async function action({ request, context: { graphql } }: ActionArgs) {
   const variables = Object.fromEntries(await request.formData());
-  variables.tags = ["test"];
   const { data, errors } = await graphql(CreatePostDocument, variables);
   if (errors) throw errors[0];
   return redirect(`/post/${data?.createPost?.post?.id}`);

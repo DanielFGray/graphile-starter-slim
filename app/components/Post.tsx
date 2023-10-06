@@ -4,11 +4,11 @@ import ago from "s-ago";
 import { Link } from "@remix-run/react";
 import { ComponentProps } from "react";
 
-function Tag<T extends keyof React.JSX.IntrinsicElements>({
+function Tag<T extends keyof React.JSX.IntrinsicElements = "span">({
   as: As = "span",
   ...props
 }: {
-  as: T;
+  as?: T;
 } & ComponentProps<T>) {
   return (
     <As
@@ -22,9 +22,6 @@ export function Post(post: PostFieldsFragment) {
   const createdAt = new Date(post.createdAt);
   return (
     <Card>
-      <Link to={`/post/${post.id}`}>
-        <h2 className="text-3xl font-bold">{post.title}</h2>
-      </Link>
       {!post.body ? null : <UserContent text={post.body} />}
       <ul className="-mx-1 flex flex-row flex-wrap items-baseline gap-2 text-xs font-medium tracking-tight">
         <Link to={`/user/${post.user?.username}`}>
@@ -32,14 +29,11 @@ export function Post(post: PostFieldsFragment) {
             by <span className="font-bold">{post.user?.username}</span>
           </Tag>
         </Link>
-        {post.tags.map(t => (
-          <Tag as="li" key={t}>
-            #{t}
+        <Link to={`/post/${post.id}`}>
+          <Tag as="time" dateTime={createdAt.toLocaleString()}>
+            {ago(createdAt)}
           </Tag>
-        ))}
-        <Tag as="time" dateTime={createdAt.toLocaleString()}>
-          {ago(createdAt)}
-        </Tag>
+        </Link>
       </ul>
     </Card>
   );

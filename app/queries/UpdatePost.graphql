@@ -1,0 +1,8 @@
+mutation UpdatePost($id: Int!, $patch: PostPatch!) {
+  updatePost(input: { id: $id, patch: $patch }) {
+    clientMutationId
+    post {
+      ...PostFields
+    }
+  }
+}

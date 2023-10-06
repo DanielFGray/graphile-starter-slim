@@ -4,7 +4,6 @@ import { FromMarkdown } from "./postformatter";
 
 export * from "./Layout";
 export * from "./Post";
-export * from "./Editor";
 
 type ElementType<P> = string | ((a: P) => React.ReactNode);
 
@@ -75,8 +74,8 @@ export function Button({
         variant === "primary"
           ? "bg-primary-600 text-primary-100 hover:bg-primary-500"
           : variant === "danger"
-          ? "bg-red-100 text-red-900 hover:bg-red-200"
-          : "bg-primary-200 text-primary-900 hover:bg-primary-100",
+            ? "bg-red-100 text-red-900 hover:bg-red-200"
+            : "bg-primary-200 text-primary-900 hover:bg-primary-100",
         `
           rounded
           border-0
@@ -107,15 +106,14 @@ export function Input({
 }:
   | React.InputHTMLAttributes<HTMLInputElement>
   | ({
-      type: "textarea";
-    } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)) {
+    type: "textarea";
+  } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)) {
   const commonClasses = clsx(
     `
     w-full
     rounded
     border-0
     bg-primary-50
-    text-sm
     shadow-md
     outline
     outline-1
@@ -137,7 +135,7 @@ export function Input({
     <textarea {...props} className={clsx("form-textarea", commonClasses, className)} />
   ) : (
     /* @ts-expect-error polymorphism is a pain to type properly */
-    <input {...props} className={clsx("form-input block", commonClasses, className)} />
+    <input {...props} className={clsx("form-input block text-sm", commonClasses, className)} />
   );
 }
 
@@ -252,9 +250,8 @@ export function SocialLogin({
       {SocialLoginServices.map(service => (
         <Button variant="primary" key={service}>
           <a
-            href={`/auth/${service.toLowerCase()}${
-              redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
-            }`}
+            href={`/auth/${service.toLowerCase()}${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+              }`}
           >
             {typeof label === "function" ? label(service) : `${label} with ${service}`}
           </a>
@@ -267,18 +264,18 @@ export function SocialLogin({
 export function UserContent(
   props:
     | {
-        editable: true;
-        onClick: () => void;
-        text: string;
-      }
+      editable: true;
+      onClick: () => void;
+      text: string;
+    }
     | {
-        text: string;
-      },
+      text: string;
+    },
 ) {
   if ("editable" in props && props.editable) {
     return (
       <button className="background-transparent group text-left" onClick={props.onClick}>
-        <div className="prose cursor-pointer rounded p-2 dark:prose-invert group-hover:outline group-hover:outline-2 group-hover:outline-primary-300 dark:group-hover:outline-primary-500">
+        <div className="prose cursor-pointer border-y-2 border-transparent rounded px-3 py-1 dark:prose-invert group-hover:outline group-hover:outline-2 group-hover:outline-primary-300 dark:group-hover:outline-primary-500">
           <FromMarkdown source={props.text} />
         </div>
         <div className="invisible relative -top-3 left-2 group-hover:visible">

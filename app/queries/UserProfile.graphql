@@ -1,0 +1,17 @@
+query UserProfile($username: Username!) {
+  ...SharedLayout_Query
+  userByUsername(username: $username) {
+    ...UserProfileFields
+  }
+}
+
+fragment UserProfileFields on User {
+  ...SharedLayout_User
+  bio
+  createdAt
+  posts(first: 10, orderBy: CREATED_AT_DESC) {
+    nodes {
+      ...PostFields
+    }
+  }
+}

@@ -9,8 +9,8 @@
  * `user_secrets`.
  */
 
-create type app_public.user_role as enum('admin', 'user');
-create domain app_public.username as citext check(length(value) >= 2 and length(value) <= 24 and value ~ '^[a-zA-Z]([_]?[a-zA-Z0-9])+$');
+create type app_public.user_role as enum('admin', 'moderator', 'user');
+create domain app_public.username as citext check(length(value) >= 2 and length(value) <= 24 and value ~ '^[a-zA-Z][a-zA-Z0-9_-]+$');
 create domain app_public.url as text check(value ~ '^https?://\S+');
 
 create table app_public.users (
@@ -26,6 +26,7 @@ create table app_public.users (
 );
 alter table app_public.users enable row level security;
 create index idx_users_username on app_public.users (username);
+create index idx_users_username_trgm on app_public.users using gin(username gin_trgm_ops);
 
 -- We couldn't implement this relationship on the sessions table until the users table existed!
 alter table app_private.sessions
