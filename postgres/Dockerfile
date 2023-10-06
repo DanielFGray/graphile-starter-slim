@@ -10,14 +10,14 @@ ENV build_deps ca-certificates \
 
 RUN apt-get install -y --no-install-recommends $build_deps
 
-RUN mkdir -p /tmp/build \
-	&& cd /tmp/build \
+RUN mkdir -p /tmp/build
+RUN cd /tmp/build \
 	&& git clone https://github.com/theory/pgtap \
 	&& cd pgtap \
 	&& git checkout tags/v1.2.0 \
 	&& make install
 
-RUN mkdir -p /tmp/build \
+RUN cd /tmp/build \
 	&& git clone https://github.com/iCyberon/pg_hashids \
 	&& cd pg_hashids \
 	&& make \
@@ -31,7 +31,7 @@ RUN apt-get install -y --no-install-recommends libicu-dev \
 	&& make clean \
 	&& make install
 
-RUN mkdir -p /tmp/build \
+RUN cd /tmp/build \
 	&& git clone https://github.com/citusdata/pg_cron \
 	&& cd pg_cron \
 	&& make \
@@ -39,4 +39,4 @@ RUN mkdir -p /tmp/build \
 
 RUN rm -fr /tmp/build \
 	&& apt-get clean \
-	&& apt-get autoremove -y $build_deps
+	&& apt-get autoremove -y libicu-dev $build_deps
