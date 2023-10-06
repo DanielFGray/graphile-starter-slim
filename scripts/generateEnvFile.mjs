@@ -67,7 +67,7 @@ async function createConfig(config) {
       {
         name: "DATABASE_HOST",
         message: "database host:",
-        default: "localhost:5432",
+        default: "localhost:5435",
         prefix: "",
       },
       {
