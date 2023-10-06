@@ -39,7 +39,7 @@ export default function UserProfile() {
               <div>
                 <div className="font-extrabold tracking-tight">
                   <span className="text-4xl">{user.username}</span>
-                  {user.role === "ADMIN" && (
+                  {user.role !== "USER" && (
                     <span className="ml-2 rounded-md bg-green-300 px-1 py-0.5 text-sm font-bold text-green-900">
                       {user.role.toLowerCase()}
                     </span>
