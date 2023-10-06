@@ -1,5 +1,5 @@
-mutation CreatePost($title: String!, $body: String!, $tags: [Tag]!) {
-  createPost(input: { post: { title: $title, body: $body, tags: $tags } }) {
+mutation CreatePost($body: String!) {
+  createPost(input: { post: { body: $body } }) {
     post {
       id
       createdAt

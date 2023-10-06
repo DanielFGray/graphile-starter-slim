@@ -1,4 +1,4 @@
-query PostById($id: String!) {
+query PostById($id: Int!) {
   ...SharedLayout_Query
   post(id: $id) {
     ...PostFields

@@ -3,10 +3,9 @@ fragment PostFields on Post {
   user {
     username
   }
-  title
   body
-  tags
   score
+  popularity
   currentUserVoted
   createdAt
   updatedAt
