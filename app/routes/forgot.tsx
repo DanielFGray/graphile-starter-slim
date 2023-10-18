@@ -1,10 +1,10 @@
 import { Button, Container, Card, FormRow, Input, Layout, Legend, FormErrors } from "~/components";
-import { json, type ActionArgs, type LoaderArgs } from "@remix-run/node";
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { ForgotPasswordDocument, SharedLayoutDocument } from "~/generated";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { forbidWhen } from "~/lib";
 
-export async function loader({ request, context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(SharedLayoutDocument);
   forbidWhen(auth => auth.LOGGED_IN, result.data?.currentUser, request);
   return json(result);
@@ -41,7 +41,7 @@ export default function ForgotPassword() {
     </Layout>
   );
 }
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const values = Object.fromEntries(await request.formData());
   const { data } = await graphql(ForgotPasswordDocument, values);
   return json(data);

@@ -1,9 +1,9 @@
 import { Container, Card, Layout } from "~/components";
 import { VerifyEmailDocument } from "~/generated";
-import { type LoaderArgs, json } from "@remix-run/node";
+import { type LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-export async function loader({ request, context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderFunctionArgs) {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams);
   const result = await graphql(VerifyEmailDocument, searchParams);
   return json({

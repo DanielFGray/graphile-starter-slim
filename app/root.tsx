@@ -3,7 +3,7 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import tailwindcss from "~/tailwind.css";
 import {
-  type V2_MetaFunction,
+  type MetaFunction,
   Links,
   LiveReload,
   Meta,
@@ -14,7 +14,7 @@ import {
   useRouteError,
 } from "@remix-run/react";
 
-export const meta: V2_MetaFunction = () => [
+export const meta: MetaFunction = () => [
   { name: "viewport", content: "width=device-width,initial-scale=1" },
   { charSet: "utf-8" },
   { httpEquiv: "Content-Language", content: "en" },

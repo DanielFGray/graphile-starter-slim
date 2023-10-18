@@ -11,10 +11,10 @@ import {
   Legend,
   SocialLogin,
 } from "../components";
-import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/node";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
 import { forbidWhen } from "~/lib";
 
-export async function loader({ request, context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(SharedLayoutDocument);
   forbidWhen(auth => auth.LOGGED_IN, result.data?.currentUser, request);
   return json(result);
@@ -51,7 +51,7 @@ export default function Login() {
     </Layout>
   );
 }
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const variables = Object.fromEntries(await request.formData());
   const searchParams = new URL(request.url).searchParams;
   const params = Object.fromEntries(searchParams);

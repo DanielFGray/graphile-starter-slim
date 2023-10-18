@@ -25,10 +25,10 @@ import {
   SocialLogin,
 } from "~/components";
 import { forbidWhen } from "~/lib";
-import { type ActionArgs, type LoaderArgs, json } from "@remix-run/node";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, json } from "@remix-run/node";
 import { useSearchParams, Form, useActionData, useLoaderData } from "@remix-run/react";
 
-export async function loader({ request, context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(ProfileSettingsDocument, {});
   forbidWhen(auth => auth.LOGGED_OUT, result.data?.currentUser, request);
   return json(result);
@@ -345,7 +345,7 @@ function DeleteAccount({ token }: { token?: string }) {
   );
 }
 
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const { type, ...formdata } = Object.fromEntries(await request.formData());
   try {
     switch (type) {

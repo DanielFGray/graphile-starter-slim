@@ -1,4 +1,4 @@
-import { ActionArgs, json, type LoaderArgs } from "@remix-run/node";
+import { ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
 import {
@@ -13,7 +13,7 @@ import {
 } from "~/components";
 import { UpdateUserDocument, User, UserProfileDocument, UserProfileQuery } from "~/generated";
 
-export async function loader({ params, context: { graphql } }: LoaderArgs) {
+export async function loader({ params, context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(UserProfileDocument, { username: params.name! });
   return json(result, { status: result.data?.userByUsername ? 200 : 404 });
 }
@@ -101,7 +101,7 @@ function ProfileEditor({
   );
 }
 
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const { type, ...formdata } = Object.fromEntries(await request.formData());
   console.log({ type, ...formdata });
   try {

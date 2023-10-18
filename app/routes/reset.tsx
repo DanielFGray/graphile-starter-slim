@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { type LoaderArgs, type ActionArgs, json } from "@remix-run/node";
+import { type LoaderFunctionArgs, type ActionFunctionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import { Button, Card, Container, FormErrors, FormRow, Input, Layout, Legend } from "~/components";
 import { ResetPasswordDocument, SharedLayoutDocument } from "~/generated";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(SharedLayoutDocument);
   return json(result);
 }
@@ -62,7 +62,7 @@ export default function ResetPage() {
   );
 }
 
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const values = Object.fromEntries(await request.formData());
   const result = await graphql(ResetPasswordDocument, values);
   if (result.errors) {

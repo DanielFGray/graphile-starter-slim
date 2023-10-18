@@ -12,10 +12,10 @@ import {
 } from "~/components";
 import { Form } from "@remix-run/react";
 import { RegisterDocument, SharedLayoutDocument } from "~/generated";
-import { type ActionArgs, type LoaderArgs, json, redirect } from "@remix-run/node";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
 import { forbidWhen } from "~/lib";
 
-export async function loader({ request, context: { graphql } }: LoaderArgs) {
+export async function loader({ request, context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(SharedLayoutDocument);
   forbidWhen(auth => auth.LOGGED_IN, result.data?.currentUser, request);
   return json(result);
@@ -87,7 +87,7 @@ export default function SignUp() {
   );
 }
 
-export const action = async ({ request, context: { graphql } }: ActionArgs) => {
+export const action = async ({ request, context: { graphql } }: ActionFunctionArgs) => {
   const formdata = Object.fromEntries(await request.formData());
   const params = Object.fromEntries(new URL(request.url).searchParams);
   const response = await graphql(RegisterDocument, formdata);

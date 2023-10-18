@@ -1,9 +1,9 @@
-import { json, type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { Layout, Card, Legend, Container, Input, FormErrors, Button, PostList } from "~/components";
 import { CreatePostDocument, LatestPostsDocument } from "~/generated";
 
-export async function loader({ context: { graphql } }: LoaderArgs) {
+export async function loader({ context: { graphql } }: LoaderFunctionArgs) {
   const result = await graphql(LatestPostsDocument);
   return json(result);
 }
@@ -35,7 +35,7 @@ export default function Index() {
   );
 }
 
-export async function action({ request, context: { graphql } }: ActionArgs) {
+export async function action({ request, context: { graphql } }: ActionFunctionArgs) {
   const variables = Object.fromEntries(await request.formData());
   const { data, errors } = await graphql(CreatePostDocument, variables);
   if (errors) throw errors[0];
